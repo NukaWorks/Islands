@@ -1,0 +1,8 @@
+{
+  "name": "server",
+  "uuid": "c96d3678",
+  "mainClass": "works.nuka.islands.SpringApp",
+  "author": "Powerm1nt",
+  "description": "Islands Server",
+  "version": "1.0.0"
+}
