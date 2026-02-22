@@ -1,0 +1,18 @@
+{
+  "name": "Islands",
+  "groupId": "works.nuka",
+  "artifactId": "islands",
+  "version": "0.0.1-SNAPSHOT",
+  "type": "application",
+  "description": "Islands web application module",
+  "build": {
+    "strip_gpg_unless_release": false,
+    "nightly_suffix_on_devel": false
+  },
+  "workspace_dependencies": [
+    {
+      "groupId": "works.nuka",
+      "artifactId": "ModularKit"
+    }
+  ]
+}
