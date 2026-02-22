@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog">
+    <changeSet id="1" author="powerm1nt">
+    <createTable tableName="users">
+        <column name="uuid" type="uuid" defaultValueComputed="gen_random_uuid()">
+            <constraints primaryKey="true" nullable="false"/>
+        </column>
+        <column name="username" type="varchar(50)">
+            <constraints nullable="false" unique="true"/>
+        </column>
+        <column name="email" type="varchar(100)">
+            <constraints nullable="false" unique="true"/>
+        </column>
+        <column name="password_hash" type="varchar(255)">
+            <constraints nullable="false"/>
+        </column>
+        <column name="created_at" type="timestamp with time zone">
+            <constraints nullable="false"/>
+        </column>
+        <column name="updated_at" type="timestamp with time zone">
+            <constraints nullable="false"/>
+        </column>
+    </createTable>
+        <createTable tableName="logs">
+            <column name="uuid" type="uuid" defaultValueComputed="gen_random_uuid()">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>

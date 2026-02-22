@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>UiKit Test App</title>
+    <script th:src="@{/js/theme.js}"></script>
+    <link rel="stylesheet" th:href="@{/css/uikit.css}" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; background-color: var(--uikit-bg-page); font-family: 'Outfit', sans-serif; display: flex; height: 100vh; color: var(--uikit-text-color); }
+        main { flex: 1; padding: 32px; overflow-y: auto; }
+        h1 { font-size: 22pt; margin: 0 0 4px; }
+        h2 { font-size: 13pt; margin: 32px 0 14px; color: var(--uikit-text-muted); border-bottom: 1px solid var(--uikit-border-color); padding-bottom: 6px; }
+        .row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-bottom: 8px; }
+        .col { display: flex; flex-direction: column; gap: 10px; }
+        .card { background: var(--uikit-bg-surface); border-radius: 10px; padding: 24px; border: 1px solid var(--uikit-border-color); margin-bottom: 12px; }
+    </style>
+</head>
+<body>
+
+<div th:replace="~{components/sidebar :: sidebar('main-sidebar', ~{::sidebar-items})}">
+    <th:block th:fragment="sidebar-items">
+        <a th:replace="~{components/sidebar :: sidebar-item('home', 'Home', '/', true)}"></a>
+        <a th:replace="~{components/sidebar :: sidebar-item('widgets', 'Components', '/components', false)}"></a>
+        <a th:replace="~{components/sidebar :: sidebar-item('palette', 'Theme', '/theme', false)}"></a>
+        <a th:replace="~{components/sidebar :: sidebar-item('settings', 'Settings', '/settings', false)}"></a>
+    </th:block>
+</div>
+
+<main>
+    <h1>UiKit Component Test</h1>
+    <span th:replace="~{components/text :: text('All components from the UiKit library rendered with Thymeleaf.', 'md', 'normal')}"></span>
+
+    <div class="card">
+        <h2>Buttons</h2>
+        <div class="row">
+            <button th:replace="~{components/button :: button('Default', 'default', 'sm', 'button')}"></button>
+            <button th:replace="~{components/button :: button('Primary', 'primary', 'sm', 'button')}"></button>
+            <button th:replace="~{components/button :: button('Success', 'success', 'sm', 'button')}"></button>
+            <button th:replace="~{components/button :: button('Warning', 'warning', 'sm', 'button')}"></button>
+            <button th:replace="~{components/button :: button('Alert', 'alert', 'sm', 'button')}"></button>
+            <button th:replace="~{components/button :: button('Disabled', 'disabled', 'sm', 'button')}"></button>
+        </div>
+        <div class="row">
+            <button th:replace="~{components/button :: button('Small', 'primary', 'sm', 'button')}"></button>
+            <button th:replace="~{components/button :: button('Medium', 'primary', 'md', 'button')}"></button>
+            <button th:replace="~{components/button :: button('Large', 'primary', 'lg', 'button')}"></button>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Text &amp; Link</h2>
+        <div class="col">
+            <span th:replace="~{components/text :: text('Small text', 'sm', 'normal')}"></span>
+            <span th:replace="~{components/text :: text('Medium text', 'md', 'normal')}"></span>
+            <span th:replace="~{components/text :: text('Large bold text', 'lg', 'bold')}"></span>
+            <span th:replace="~{components/text :: text('XL semibold text', 'xl', 'semibold')}"></span>
+            <a th:replace="~{components/text :: link('Visit NukaWorks', 'https://github.com', true)}"></a>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>TextField</h2>
+        <div class="col" style="max-width: 340px;">
+            <div th:replace="~{components/textfield :: textfield('username', null, 'Enter username', 'text', 'Username')}"></div>
+            <div th:replace="~{components/textfield :: textfield('password', null, 'Enter password', 'password', 'Password')}"></div>
+            <div th:replace="~{components/textfield :: textfield('email', null, 'Enter email', 'email', 'Email')}"></div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Checkbox / Radio / Switch</h2>
+        <div class="col">
+            <div class="row">
+                <label th:replace="~{components/checkbox :: checkbox('opt1', 'Option A', true, false)}"></label>
+                <label th:replace="~{components/checkbox :: checkbox('opt2', 'Option B', false, false)}"></label>
+                <label th:replace="~{components/checkbox :: checkbox('opt3', 'Disabled', false, true)}"></label>
+            </div>
+            <div class="row">
+                <label th:replace="~{components/checkbox :: radio('plan', 'Free', 'free', true, false)}"></label>
+                <label th:replace="~{components/checkbox :: radio('plan', 'Pro', 'pro', false, false)}"></label>
+                <label th:replace="~{components/checkbox :: radio('plan', 'Enterprise', 'enterprise', false, false)}"></label>
+            </div>
+            <div class="row">
+                <label th:replace="~{components/checkbox :: switch('notif', 'Notifications', true, false)}"></label>
+                <label th:replace="~{components/checkbox :: switch('darkmode', 'Dark Mode', false, false)}"></label>
+                <label th:replace="~{components/checkbox :: switch('disabled', 'Disabled', true, true)}"></label>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Avatar</h2>
+        <div class="row">
+            <div th:replace="~{components/avatar :: avatar(null, null, 'JD', 'sm')}"></div>
+            <div th:replace="~{components/avatar :: avatar(null, null, 'AB', 'md')}"></div>
+            <div th:replace="~{components/avatar :: avatar(null, null, 'NK', 'lg')}"></div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Progress Bar &amp; Spinner</h2>
+        <div class="col" style="max-width: 400px; gap: 14px;">
+            <div th:replace="~{components/progress :: progress(30, 100, 'primary')}"></div>
+            <div th:replace="~{components/progress :: progress(60, 100, 'success')}"></div>
+            <div th:replace="~{components/progress :: progress(80, 100, 'warning')}"></div>
+            <div th:replace="~{components/progress :: progress(45, 100, 'alert')}"></div>
+        </div>
+        <div class="row" style="margin-top: 16px;">
+            <div th:replace="~{components/progress :: spinner('sm')}"></div>
+            <div th:replace="~{components/progress :: spinner('md')}"></div>
+            <div th:replace="~{components/progress :: spinner('lg')}"></div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>ListView</h2>
+        <div th:replace="~{components/listview :: listview(~{::list-items})}" style="max-width: 300px; border: 1px solid rgba(0,0,0,0.1); border-radius: 8px; padding: 4px;">
+            <th:block th:fragment="list-items">
+                <div th:replace="~{components/listview :: listview-item('Dashboard', 'home', '/dashboard')}"></div>
+                <div th:replace="~{components/listview :: listview-item('Packages', 'inventory_2', '/packages')}"></div>
+                <div th:replace="~{components/listview :: listview-item('Settings', 'settings', '/settings')}"></div>
+                <div th:replace="~{components/listview :: listview-item('No Link Item', 'info', null)}"></div>
+            </th:block>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Menu</h2>
+        <ul th:replace="~{components/menu :: menu('test-menu', ~{::menu-items})}" style="display: inline-block;">
+            <th:block th:fragment="menu-items">
+                <li th:replace="~{components/menu :: menu-item('Profile', '/profile', 'person', false)}"></li>
+                <li th:replace="~{components/menu :: menu-item('Settings', '/settings', 'settings', false)}"></li>
+                <li th:replace="~{components/menu :: menu-separator}"></li>
+                <li th:replace="~{components/menu :: menu-item('Disabled Item', '#', 'block', true)}"></li>
+                <li th:replace="~{components/menu :: menu-separator}"></li>
+                <li th:replace="~{components/menu :: menu-item('Logout', '/logout', 'logout', false)}"></li>
+            </th:block>
+        </ul>
+    </div>
+
+    <div class="card">
+        <h2>Tooltip</h2>
+        <div class="row">
+            <button class="uikit-btn uikit-btn-primary uikit-btn-sm uikit-tooltip uikit-tooltip-top" data-tip="Top tooltip">Hover (top)</button>
+            <button class="uikit-btn uikit-btn-success uikit-btn-sm uikit-tooltip uikit-tooltip-bottom" data-tip="Bottom tooltip">Hover (bottom)</button>
+            <button class="uikit-btn uikit-btn-warning uikit-btn-sm uikit-tooltip uikit-tooltip-right" data-tip="Right tooltip">Hover (right)</button>
+        </div>
+    </div>
+
+</main>
+
+</body>
+</html>
+
+

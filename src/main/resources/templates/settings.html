@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Settings — UiKit</title>
+    <script th:src="@{/js/theme.js}"></script>
+    <link rel="stylesheet" th:href="@{/css/uikit.css}" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; background-color: var(--uikit-bg-page); font-family: 'Outfit', sans-serif; display: flex; height: 100vh; color: var(--uikit-text-color); }
+        main { flex: 1; padding: 32px; overflow-y: auto; }
+        h1 { font-size: 22pt; margin: 0 0 4px; }
+        h2 { font-size: 13pt; margin: 32px 0 14px; color: var(--uikit-text-muted); border-bottom: 1px solid var(--uikit-border-color); padding-bottom: 6px; }
+        .row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-bottom: 8px; }
+        .col { display: flex; flex-direction: column; gap: 10px; }
+        .card { background: var(--uikit-bg-surface); border-radius: 10px; padding: 24px; border: 1px solid var(--uikit-border-color); margin-bottom: 12px; }
+        .setting-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--uikit-border-color); }
+        .setting-row:last-child { border-bottom: none; }
+        .custom-panel { margin-top: 18px; display: none; flex-wrap: wrap; gap: 20px; }
+        .custom-panel.visible { display: flex; }
+        .color-field { display: flex; flex-direction: column; gap: 6px; font-size: 9pt; color: var(--uikit-text-muted); font-family: 'Outfit', sans-serif; }
+        .color-field input[type=color] { width: 60px; height: 38px; border: 1px solid var(--uikit-border-color); border-radius: 5px; cursor: pointer; padding: 2px; background: var(--uikit-input-bg); }
+    </style>
+</head>
+<body>
+
+<div th:replace="~{components/sidebar :: sidebar('main-sidebar', ~{::sidebar-items})}">
+    <th:block th:fragment="sidebar-items">
+        <a th:replace="~{components/sidebar :: sidebar-item('home', 'Home', '/', false)}"></a>
+        <a th:replace="~{components/sidebar :: sidebar-item('widgets', 'Components', '/components', false)}"></a>
+        <a th:replace="~{components/sidebar :: sidebar-item('palette', 'Theme', '/theme', false)}"></a>
+        <a th:replace="~{components/sidebar :: sidebar-item('settings', 'Settings', '/settings', true)}"></a>
+    </th:block>
+</div>
+
+<main>
+    <h1>Settings</h1>
+    <span th:replace="~{components/text :: text('Configure your application preferences.', 'md', 'normal')}"></span>
+
+    <div class="card">
+        <h2>Profile</h2>
+        <div class="col" style="max-width: 380px; gap: 14px;">
+            <div th:replace="~{components/textfield :: textfield('displayName', null, 'Your name', 'text', 'Display Name')}"></div>
+            <div th:replace="~{components/textfield :: textfield('email', null, 'your@email.com', 'email', 'Email')}"></div>
+            <div th:replace="~{components/textfield :: textfield('website', null, 'https://...', 'url', 'Website')}"></div>
+            <div class="row">
+                <button th:replace="~{components/button :: button('Save Changes', 'primary', 'sm', 'submit')}"></button>
+                <button th:replace="~{components/button :: button('Cancel', 'default', 'sm', 'button')}"></button>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Notifications</h2>
+        <div class="col">
+            <div class="setting-row">
+                <span th:replace="~{components/text :: text('Email notifications', 'md', 'normal')}"></span>
+                <label th:replace="~{components/checkbox :: switch('emailNotif', null, true, false)}"></label>
+            </div>
+            <div class="setting-row">
+                <span th:replace="~{components/text :: text('Push notifications', 'md', 'normal')}"></span>
+                <label th:replace="~{components/checkbox :: switch('pushNotif', null, false, false)}"></label>
+            </div>
+            <div class="setting-row">
+                <span th:replace="~{components/text :: text('Weekly digest', 'md', 'normal')}"></span>
+                <label th:replace="~{components/checkbox :: switch('digest', null, true, false)}"></label>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Appearance</h2>
+        <div class="row">
+            <label th:replace="~{components/checkbox :: radio('theme-select', 'Light',  'light',  true,  false)}"></label>
+            <label th:replace="~{components/checkbox :: radio('theme-select', 'Dark',   'dark',   false, false)}"></label>
+            <label th:replace="~{components/checkbox :: radio('theme-select', 'Custom', 'custom', false, false)}"></label>
+        </div>
+        <div class="custom-panel" id="custom-panel">
+            <div class="color-field">
+                <label>Page background</label>
+                <input type="color" id="c-bg-page"    value="#f4f4f4" oninput="applyCustom()" />
+            </div>
+            <div class="color-field">
+                <label>Surface</label>
+                <input type="color" id="c-bg-surface" value="#ffffff" oninput="applyCustom()" />
+            </div>
+            <div class="color-field">
+                <label>Text</label>
+                <input type="color" id="c-text"       value="#111111" oninput="applyCustom()" />
+            </div>
+            <div class="color-field">
+                <label>Primary</label>
+                <input type="color" id="c-primary"    value="#1ea7fd" oninput="applyCustom()" />
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Danger Zone</h2>
+        <div class="row">
+            <button th:replace="~{components/button :: button('Delete Account', 'alert', 'sm', 'button')}"></button>
+            <button th:replace="~{components/button :: button('Reset All Settings', 'warning', 'sm', 'button')}"></button>
+        </div>
+    </div>
+</main>
+
+<script>
+function buildCustomVars() {
+    return {
+        '--custom-bg-page':        document.getElementById('c-bg-page').value,
+        '--custom-bg-surface':     document.getElementById('c-bg-surface').value,
+        '--custom-text':           document.getElementById('c-text').value,
+        '--custom-primary':        document.getElementById('c-primary').value,
+        '--custom-primary-hover':  adjustColor(document.getElementById('c-primary').value, -15),
+        '--custom-primary-active': adjustColor(document.getElementById('c-primary').value, -25),
+    };
+}
+
+function adjustColor(hex, amt) {
+    const n = parseInt(hex.slice(1), 16);
+    const clamp = x => Math.min(255, Math.max(0, x));
+    return '#' + [
+        clamp((n >> 16) + amt),
+        clamp(((n >> 8) & 0xff) + amt),
+        clamp((n & 0xff) + amt)
+    ].map(x => x.toString(16).padStart(2, '0')).join('');
+}
+
+function applyCustom() {
+    saveTheme('custom', buildCustomVars());
+}
+
+document.querySelectorAll('input[name="theme-select"]').forEach(radio => {
+    radio.addEventListener('change', () => {
+        const theme = radio.value;
+        document.getElementById('custom-panel').classList.toggle('visible', theme === 'custom');
+        saveTheme(theme, theme === 'custom' ? buildCustomVars() : {});
+    });
+});
+
+(function init() {
+    const theme      = localStorage.getItem('uikit-theme') || 'light';
+    const customVars = JSON.parse(localStorage.getItem('uikit-custom-vars') || '{}');
+
+    const radio = document.querySelector('input[name="theme-select"][value="' + theme + '"]');
+    if (radio) radio.checked = true;
+
+    if (theme === 'custom') {
+        document.getElementById('custom-panel').classList.add('visible');
+        const set = (id, key) => { if (customVars[key]) document.getElementById(id).value = customVars[key]; };
+        set('c-bg-page',    '--custom-bg-page');
+        set('c-bg-surface', '--custom-bg-surface');
+        set('c-text',       '--custom-text');
+        set('c-primary',    '--custom-primary');
+    }
+})();
+</script>
+
+</body>
+</html>
+

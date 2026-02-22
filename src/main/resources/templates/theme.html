@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Theme — UiKit</title>
+    <script th:src="@{/js/theme.js}"></script>
+    <link rel="stylesheet" th:href="@{/css/uikit.css}" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; background-color: var(--uikit-bg-page); font-family: 'Outfit', sans-serif; display: flex; height: 100vh; color: var(--uikit-text-color); }
+        main { flex: 1; padding: 32px; overflow-y: auto; }
+        h1 { font-size: 22pt; margin: 0 0 4px; }
+        h2 { font-size: 13pt; margin: 32px 0 14px; color: var(--uikit-text-muted); border-bottom: 1px solid var(--uikit-border-color); padding-bottom: 6px; }
+        .row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-bottom: 8px; }
+        .col { display: flex; flex-direction: column; gap: 10px; }
+        .card { background: var(--uikit-bg-surface); border-radius: 10px; padding: 24px; border: 1px solid var(--uikit-border-color); margin-bottom: 12px; }
+        .swatch-grid { display: flex; flex-wrap: wrap; gap: 12px; }
+        .swatch { width: 80px; text-align: center; font-size: 8pt; color: var(--uikit-text-muted); }
+        .swatch-color { width: 80px; height: 48px; border-radius: 8px; border: 1px solid var(--uikit-border-color); margin-bottom: 4px; }
+    </style>
+</head>
+<body>
+
+<div th:replace="~{components/sidebar :: sidebar('main-sidebar', ~{::sidebar-items})}">
+    <th:block th:fragment="sidebar-items">
+        <a th:replace="~{components/sidebar :: sidebar-item('home', 'Home', '/', false)}"></a>
+        <a th:replace="~{components/sidebar :: sidebar-item('widgets', 'Components', '/components', false)}"></a>
+        <a th:replace="~{components/sidebar :: sidebar-item('palette', 'Theme', '/theme', true)}"></a>
+        <a th:replace="~{components/sidebar :: sidebar-item('settings', 'Settings', '/settings', false)}"></a>
+    </th:block>
+</div>
+
+<main>
+    <h1>Theme</h1>
+    <span th:replace="~{components/text :: text('Color palette and typography from the default theme.', 'md', 'normal')}"></span>
+
+    <div class="card">
+        <h2>Color Palette</h2>
+        <div class="swatch-grid">
+            <div class="swatch"><div class="swatch-color" style="background:#1ea7fd;"></div>Primary</div>
+            <div class="swatch"><div class="swatch-color" style="background:#12c421;"></div>Success</div>
+            <div class="swatch"><div class="swatch-color" style="background:#eab403;"></div>Warning</div>
+            <div class="swatch"><div class="swatch-color" style="background:#ff5724;"></div>Alert</div>
+            <div class="swatch"><div class="swatch-color" style="background:#a2a2a2;"></div>Default</div>
+            <div class="swatch"><div class="swatch-color" style="background:#e0e0e0;"></div>Disabled</div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Typography</h2>
+        <div class="col">
+            <span th:replace="~{components/text :: text('Small — 9pt normal', 'sm', 'normal')}"></span>
+            <span th:replace="~{components/text :: text('Medium — 11pt normal', 'md', 'normal')}"></span>
+            <span th:replace="~{components/text :: text('Large — 14pt normal', 'lg', 'normal')}"></span>
+            <span th:replace="~{components/text :: text('XL — 18pt normal', 'xl', 'normal')}"></span>
+            <span th:replace="~{components/text :: text('Medium weight', 'md', 'medium')}"></span>
+            <span th:replace="~{components/text :: text('Semibold weight', 'md', 'semibold')}"></span>
+            <span th:replace="~{components/text :: text('Bold weight', 'md', 'bold')}"></span>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Buttons by Color</h2>
+        <div class="row">
+            <button th:replace="~{components/button :: button('Default', 'default', 'sm', 'button')}"></button>
+            <button th:replace="~{components/button :: button('Primary', 'primary', 'sm', 'button')}"></button>
+            <button th:replace="~{components/button :: button('Success', 'success', 'sm', 'button')}"></button>
+            <button th:replace="~{components/button :: button('Warning', 'warning', 'sm', 'button')}"></button>
+            <button th:replace="~{components/button :: button('Alert', 'alert', 'sm', 'button')}"></button>
+            <button th:replace="~{components/button :: button('Disabled', 'disabled', 'sm', 'button')}"></button>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Avatar Sizes</h2>
+        <div class="row" style="align-items: flex-end;">
+            <div>
+                <div th:replace="~{components/avatar :: avatar(null, null, 'SM', 'sm')}"></div>
+                <div style="font-size:8pt; margin-top:4px; text-align:center;">sm</div>
+            </div>
+            <div>
+                <div th:replace="~{components/avatar :: avatar(null, null, 'MD', 'md')}"></div>
+                <div style="font-size:8pt; margin-top:4px; text-align:center;">md</div>
+            </div>
+            <div>
+                <div th:replace="~{components/avatar :: avatar(null, null, 'LG', 'lg')}"></div>
+                <div style="font-size:8pt; margin-top:4px; text-align:center;">lg</div>
+            </div>
+        </div>
+    </div>
+</main>
+</body>
+</html>
+

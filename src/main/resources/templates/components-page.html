@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Components — UiKit</title>
+    <script th:src="@{/js/theme.js}"></script>
+    <link rel="stylesheet" th:href="@{/css/uikit.css}" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; background-color: var(--uikit-bg-page); font-family: 'Outfit', sans-serif; display: flex; height: 100vh; color: var(--uikit-text-color); }
+        main { flex: 1; padding: 32px; overflow-y: auto; }
+        h1 { font-size: 22pt; margin: 0 0 4px; }
+        h2 { font-size: 13pt; margin: 32px 0 14px; color: var(--uikit-text-muted); border-bottom: 1px solid var(--uikit-border-color); padding-bottom: 6px; }
+        .row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-bottom: 8px; }
+        .col { display: flex; flex-direction: column; gap: 10px; }
+        .card { background: var(--uikit-bg-surface); border-radius: 10px; padding: 24px; border: 1px solid var(--uikit-border-color); margin-bottom: 12px; }
+    </style>
+</head>
+<body>
+
+<div th:replace="~{components/sidebar :: sidebar('main-sidebar', ~{::sidebar-items})}">
+    <th:block th:fragment="sidebar-items">
+        <a th:replace="~{components/sidebar :: sidebar-item('home', 'Home', '/', false)}"></a>
+        <a th:replace="~{components/sidebar :: sidebar-item('widgets', 'Components', '/components', true)}"></a>
+        <a th:replace="~{components/sidebar :: sidebar-item('palette', 'Theme', '/theme', false)}"></a>
+        <a th:replace="~{components/sidebar :: sidebar-item('settings', 'Settings', '/settings', false)}"></a>
+    </th:block>
+</div>
+
+<main>
+    <h1>Components</h1>
+    <span th:replace="~{components/text :: text('Individual component reference.', 'md', 'normal')}"></span>
+
+    <div class="card">
+        <h2>Form Inputs</h2>
+        <div class="col" style="max-width: 340px;">
+            <div th:replace="~{components/textfield :: textfield('text', null, 'Text input', 'text', 'Text')}"></div>
+            <div th:replace="~{components/textfield :: textfield('number', null, '42', 'number', 'Number')}"></div>
+            <div th:replace="~{components/textfield :: textfield('url', null, 'https://...', 'url', 'URL')}"></div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Checkbox</h2>
+        <div class="row">
+            <label th:replace="~{components/checkbox :: checkbox('c1', 'Unchecked', false, false)}"></label>
+            <label th:replace="~{components/checkbox :: checkbox('c2', 'Checked', true, false)}"></label>
+            <label th:replace="~{components/checkbox :: checkbox('c3', 'Disabled', false, true)}"></label>
+            <label th:replace="~{components/checkbox :: checkbox('c4', 'Checked + Disabled', true, true)}"></label>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Radio</h2>
+        <div class="row">
+            <label th:replace="~{components/checkbox :: radio('size', 'Small', 'sm', true, false)}"></label>
+            <label th:replace="~{components/checkbox :: radio('size', 'Medium', 'md', false, false)}"></label>
+            <label th:replace="~{components/checkbox :: radio('size', 'Large', 'lg', false, false)}"></label>
+            <label th:replace="~{components/checkbox :: radio('size', 'Disabled', 'xl', false, true)}"></label>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Switch</h2>
+        <div class="row">
+            <label th:replace="~{components/checkbox :: switch('s1', 'Off', false, false)}"></label>
+            <label th:replace="~{components/checkbox :: switch('s2', 'On', true, false)}"></label>
+            <label th:replace="~{components/checkbox :: switch('s3', 'Disabled', true, true)}"></label>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>ListView</h2>
+        <div th:replace="~{components/listview :: listview(~{::list-items})}" style="max-width: 300px; border: 1px solid rgba(0,0,0,0.1); border-radius: 8px; padding: 4px;">
+            <th:block th:fragment="list-items">
+                <div th:replace="~{components/listview :: listview-item('Buttons', 'smart_button', null)}"></div>
+                <div th:replace="~{components/listview :: listview-item('Inputs', 'input', null)}"></div>
+                <div th:replace="~{components/listview :: listview-item('Avatars', 'account_circle', null)}"></div>
+                <div th:replace="~{components/listview :: listview-item('Progress', 'data_usage', null)}"></div>
+            </th:block>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Menu</h2>
+        <ul th:replace="~{components/menu :: menu('comp-menu', ~{::menu-items})}" style="display:inline-block;">
+            <th:block th:fragment="menu-items">
+                <li th:replace="~{components/menu :: menu-item('Buttons', '#buttons', 'smart_button', false)}"></li>
+                <li th:replace="~{components/menu :: menu-item('Inputs', '#inputs', 'input', false)}"></li>
+                <li th:replace="~{components/menu :: menu-separator}"></li>
+                <li th:replace="~{components/menu :: menu-item('Unavailable', '#', 'block', true)}"></li>
+            </th:block>
+        </ul>
+    </div>
+</main>
+</body>
+</html>
+
