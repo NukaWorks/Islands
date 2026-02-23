@@ -5,14 +5,6 @@
   "version": "0.0.1-SNAPSHOT",
   "type": "application",
   "description": "Islands web application module",
-  "artifact_name": "islands-0.0.1-SNAPSHOT.jar",
-  "module": {
-    "name": "server",
-    "uuid": "c96d3678",
-    "mainClass": "works.nuka.islands.SpringApp",
-    "author": "Powerm1nt",
-    "description": "Islands Server"
-  },
   "build": {
     "strip_gpg_unless_release": false,
     "nightly_suffix_on_devel": false
@@ -26,5 +18,13 @@
       "groupId": "works.nuka",
       "artifactId": "UiKit"
     }
-  ]
+  ],
+  "artifact_name": "islands-0.0.1-SNAPSHOT.jar",
+  "module": {
+    "name": "server",
+    "uuid": "c96d3678",
+    "mainClass": "works.nuka.islands.SpringApp",
+    "author": "Powerm1nt",
+    "description": "Islands Server"
+  }
 }
