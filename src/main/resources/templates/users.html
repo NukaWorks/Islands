@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Users — Islands</title>
+    <script th:src="@{/js/theme.js}"></script>
+    <link rel="stylesheet" th:href="@{/css/uikit.css}" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+        * { box-sizing: border-box; }
+        body  { margin: 0; background: var(--uikit-bg-page); font-family: 'Outfit', sans-serif; display: flex; height: 100vh; color: var(--uikit-text-color); }
+        main  { flex: 1; padding: 32px; overflow-y: auto; }
+        .page-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 28px; flex-wrap: wrap; gap: 12px; }
+        .page-header h1 { font-size: 22pt; margin: 0 0 4px; }
+        .card { background: var(--uikit-bg-surface); border-radius: 12px; padding: 24px; border: 1px solid var(--uikit-border-color); margin-bottom: 20px; }
+        .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; flex-wrap: wrap; gap: 12px; }
+        .card-title { font-size: 12pt; font-weight: 600; margin: 0; display: flex; align-items: center; gap: 8px; }
+        .card-title i { font-size: 1.1rem; color: var(--uikit-color-primary); }
+        /* Stat chips */
+        .stat-chips { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
+        .stat-chip { background: var(--uikit-bg-surface); border: 1px solid var(--uikit-border-color); border-radius: 8px; padding: 12px 18px; display: flex; flex-direction: column; gap: 2px; min-width: 110px; }
+        .stat-chip-val { font-size: 18pt; font-weight: 700; line-height: 1; }
+        .stat-chip-lbl { font-size: 8pt; color: var(--uikit-text-muted); text-transform: uppercase; letter-spacing: 0.04em; font-weight: 600; }
+        .stat-chip-val.primary { color: var(--uikit-color-primary); }
+        .stat-chip-val.success { color: var(--uikit-color-success); }
+        .stat-chip-val.muted   { color: var(--uikit-text-muted); }
+        /* Badges */
+        .badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px; font-size: 8pt; font-weight: 600; white-space: nowrap; }
+        .badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+        .badge-active   { background: rgba(18,196,33,0.12);  color: #0fa21c; }  .badge-active::before   { background: #12c421; }
+        .badge-inactive { background: rgba(162,162,162,0.15);color: #666; }     .badge-inactive::before { background: #a2a2a2; }
+        /* Role chips */
+        .role-chip { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 8pt; font-weight: 600; }
+        .role-admin    { background: rgba(30,167,253,0.12);  color: #1ea7fd; }
+        .role-user     { background: rgba(162,162,162,0.12); color: #555; }
+        .role-operator { background: rgba(234,180,3,0.15);   color: #b08200; }
+        .role-viewer   { background: rgba(162,100,253,0.12); color: #8c4cff; }
+        /* Group tags */
+        .group-list { display: flex; gap: 4px; flex-wrap: wrap; }
+        .group-tag { background: var(--uikit-border-color); color: var(--uikit-text-muted); padding: 1px 6px; border-radius: 4px; font-size: 8pt; border: 1px solid var(--uikit-border-color); }
+        /* User cell */
+        .user-cell { display: flex; align-items: center; gap: 10px; }
+        /* Form grid */
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .form-grid .span2 { grid-column: span 2; }
+        .form-label { font-size: 8.5pt; font-weight: 600; color: var(--uikit-text-muted); margin-bottom: 4px; display: block; text-transform: uppercase; letter-spacing: 0.03em; }
+        .text-muted { color: var(--uikit-text-muted); font-size: 9pt; }
+        .text-danger { color: var(--uikit-color-alert); font-size: 9pt; margin-top: 8px; }
+        strong { font-weight: 700; }
+    </style>
+</head>
+<body>
+
+<div th:replace="~{components/sidebar :: sidebar('main-sidebar', ~{::sidebar-content})}">
+    <th:block th:fragment="sidebar-content">
+        <a th:replace="~{components/sidebar :: sidebar-item('dashboard', 'Dashboard', '/dashboard', false)}"></a>
+        <a th:replace="~{components/sidebar :: sidebar-item('dns', 'Instances', '/instances', false)}"></a>
+        <a th:replace="~{components/sidebar :: sidebar-item('task', 'Tasks', '/tasks', false)}"></a>
+        <a th:replace="~{components/sidebar :: sidebar-item('group', 'Users', '/users', true)}"></a>
+        <a th:replace="~{components/sidebar :: sidebar-item('cloud', 'Providers', '/providers', false)}"></a>
+        <a th:replace="~{components/sidebar :: sidebar-item('settings', 'Settings', '/settings', false)}"></a>
+    </th:block>
+</div>
+
+<main>
+    <div class="page-header">
+        <div>
+            <h1>Users</h1>
+            <span th:replace="~{components/text :: text('Manage user accounts, roles and permissions.', 'md', 'normal')}"></span>
+        </div>
+        <button class="uikit-btn uikit-btn-primary uikit-btn-sm" onclick="UiKitModal.open('modal-add-user')">Add User</button>
+    </div>
+
+    <div class="stat-chips">
+        <div class="stat-chip"><div class="stat-chip-val primary">6</div><div class="stat-chip-lbl">Total</div></div>
+        <div class="stat-chip"><div class="stat-chip-val success">4</div><div class="stat-chip-lbl">Active</div></div>
+        <div class="stat-chip"><div class="stat-chip-val muted">2</div><div class="stat-chip-lbl">Inactive</div></div>
+        <div class="stat-chip"><div class="stat-chip-val primary">1</div><div class="stat-chip-lbl">Admins</div></div>
+    </div>
+
+    <!-- ── Users table ─────────────────────────────────────────────────── -->
+    <div class="card">
+        <div class="card-header"><h2 class="card-title"><i class="material-icons">group</i> All Users</h2></div>
+        <div id="users-table" class="uikit-table-wrap">
+            <div class="uikit-table-toolbar">
+                <div th:replace="~{components/table :: table-search('users-table')}"></div>
+                <select class="uikit-table-filter" data-table="users-table" data-col="2">
+                    <option value="">All roles</option>
+                    <option value="admin">admin</option>
+                    <option value="operator">operator</option>
+                    <option value="user">user</option>
+                    <option value="viewer">viewer</option>
+                </select>
+                <select class="uikit-table-filter" data-table="users-table" data-col="4">
+                    <option value="">All statuses</option>
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                </select>
+                <span class="uikit-table-row-count"></span>
+            </div>
+            <table class="uikit-table">
+                <thead><tr>
+                    <th th:replace="~{components/table :: table-th('User',      'user')}"></th>
+                    <th th:replace="~{components/table :: table-th('Email',     'email')}"></th>
+                    <th th:replace="~{components/table :: table-th('Role',      'role')}"></th>
+                    <th th:replace="~{components/table :: table-th-plain('Groups')}"></th>
+                    <th th:replace="~{components/table :: table-th('Status',    'status')}"></th>
+                    <th th:replace="~{components/table :: table-th('Last Seen', 'seen')}"></th>
+                    <th th:replace="~{components/table :: table-th-plain('Actions')}"></th>
+                </tr></thead>
+                <tbody>
+                    <tr>
+                        <td data-value="John Doe jdoe"><div class="user-cell"><div th:replace="~{components/avatar :: avatar(null,null,'JD','md')}"></div><div style="display:flex;flex-direction:column;gap:1px;"><span class="uikit-text uikit-text-sm uikit-text-semibold">John Doe</span><span class="uikit-text uikit-text-sm" style="color:var(--uikit-text-muted);">jdoe</span></div></div></td>
+                        <td data-value="jdoe@islands.internal"><span class="uikit-text uikit-text-sm">jdoe@islands.internal</span></td>
+                        <td data-value="admin"><span class="role-chip role-admin">admin</span></td>
+                        <td><div class="group-list"><span class="group-tag">Administrators</span><span class="group-tag">Operators</span></div></td>
+                        <td data-value="Active"><span class="badge badge-active">Active</span></td>
+                        <td data-value="Just now"><span class="uikit-text uikit-text-sm">Just now</span></td>
+                        <td><div id="dd-u-1" class="uikit-dropdown"><button class="uikit-dropdown-trigger uikit-btn uikit-btn-default uikit-btn-sm" type="button" onclick="UiKitDropdown.toggle('dd-u-1')"><i class="material-icons" style="font-size:1rem;vertical-align:middle;">more_vert</i></button><ul class="uikit-dropdown-menu uikit-menu" role="menu"><li th:replace="~{components/dropdown :: dropdown-item('Edit','edit','UiKitModal.open(\'modal-edit-user\')','default')}"></li><li th:replace="~{components/dropdown :: dropdown-item('Permissions','lock','UiKitModal.open(\'modal-user-permissions\')','default')}"></li></ul></div></td>
+                    </tr>
+                    <tr>
+                        <td data-value="Alice Brown alice"><div class="user-cell"><div th:replace="~{components/avatar :: avatar(null,null,'AB','md')}"></div><div style="display:flex;flex-direction:column;gap:1px;"><span class="uikit-text uikit-text-sm uikit-text-semibold">Alice Brown</span><span class="uikit-text uikit-text-sm" style="color:var(--uikit-text-muted);">alice</span></div></div></td>
+                        <td data-value="alice@islands.internal"><span class="uikit-text uikit-text-sm">alice@islands.internal</span></td>
+                        <td data-value="operator"><span class="role-chip role-operator">operator</span></td>
+                        <td><div class="group-list"><span class="group-tag">Operators</span></div></td>
+                        <td data-value="Active"><span class="badge badge-active">Active</span></td>
+                        <td data-value="5m ago"><span class="uikit-text uikit-text-sm">5m ago</span></td>
+                        <td><div id="dd-u-2" class="uikit-dropdown"><button class="uikit-dropdown-trigger uikit-btn uikit-btn-default uikit-btn-sm" type="button" onclick="UiKitDropdown.toggle('dd-u-2')"><i class="material-icons" style="font-size:1rem;vertical-align:middle;">more_vert</i></button><ul class="uikit-dropdown-menu uikit-menu" role="menu"><li th:replace="~{components/dropdown :: dropdown-item('Edit','edit','UiKitModal.open(\'modal-edit-user\')','default')}"></li><li th:replace="~{components/dropdown :: dropdown-item('Permissions','lock','UiKitModal.open(\'modal-user-permissions\')','default')}"></li><li th:replace="~{components/dropdown :: dropdown-separator}"></li><li th:replace="~{components/dropdown :: dropdown-item('Deactivate','block','UiKitModal.open(\'modal-deactivate-user\')','warning')}"></li></ul></div></td>
+                    </tr>
+                    <tr>
+                        <td data-value="Bob Turner bob"><div class="user-cell"><div th:replace="~{components/avatar :: avatar(null,null,'BT','md')}"></div><div style="display:flex;flex-direction:column;gap:1px;"><span class="uikit-text uikit-text-sm uikit-text-semibold">Bob Turner</span><span class="uikit-text uikit-text-sm" style="color:var(--uikit-text-muted);">bob</span></div></div></td>
+                        <td data-value="bob@islands.internal"><span class="uikit-text uikit-text-sm">bob@islands.internal</span></td>
+                        <td data-value="user"><span class="role-chip role-user">user</span></td>
+                        <td><div class="group-list"><span class="group-tag">Users</span></div></td>
+                        <td data-value="Inactive"><span class="badge badge-inactive">Inactive</span></td>
+                        <td data-value="3d ago"><span class="uikit-text uikit-text-sm">3d ago</span></td>
+                        <td><div id="dd-u-3" class="uikit-dropdown"><button class="uikit-dropdown-trigger uikit-btn uikit-btn-default uikit-btn-sm" type="button" onclick="UiKitDropdown.toggle('dd-u-3')"><i class="material-icons" style="font-size:1rem;vertical-align:middle;">more_vert</i></button><ul class="uikit-dropdown-menu uikit-menu" role="menu"><li th:replace="~{components/dropdown :: dropdown-item('Edit','edit','UiKitModal.open(\'modal-edit-user\')','default')}"></li><li th:replace="~{components/dropdown :: dropdown-item('Permissions','lock','UiKitModal.open(\'modal-user-permissions\')','default')}"></li><li th:replace="~{components/dropdown :: dropdown-item('Activate','check_circle','UiKitModal.open(\'modal-activate-user\')','default')}"></li><li th:replace="~{components/dropdown :: dropdown-separator}"></li><li th:replace="~{components/dropdown :: dropdown-item('Delete','delete','UiKitModal.open(\'modal-delete-user\')','alert')}"></li></ul></div></td>
+                    </tr>
+                    <tr>
+                        <td data-value="Carol King carol"><div class="user-cell"><div th:replace="~{components/avatar :: avatar(null,null,'CK','md')}"></div><div style="display:flex;flex-direction:column;gap:1px;"><span class="uikit-text uikit-text-sm uikit-text-semibold">Carol King</span><span class="uikit-text uikit-text-sm" style="color:var(--uikit-text-muted);">carol</span></div></div></td>
+                        <td data-value="carol@islands.internal"><span class="uikit-text uikit-text-sm">carol@islands.internal</span></td>
+                        <td data-value="user"><span class="role-chip role-user">user</span></td>
+                        <td><div class="group-list"><span class="group-tag">Users</span></div></td>
+                        <td data-value="Active"><span class="badge badge-active">Active</span></td>
+                        <td data-value="1h ago"><span class="uikit-text uikit-text-sm">1h ago</span></td>
+                        <td><div id="dd-u-4" class="uikit-dropdown"><button class="uikit-dropdown-trigger uikit-btn uikit-btn-default uikit-btn-sm" type="button" onclick="UiKitDropdown.toggle('dd-u-4')"><i class="material-icons" style="font-size:1rem;vertical-align:middle;">more_vert</i></button><ul class="uikit-dropdown-menu uikit-menu" role="menu"><li th:replace="~{components/dropdown :: dropdown-item('Edit','edit','UiKitModal.open(\'modal-edit-user\')','default')}"></li><li th:replace="~{components/dropdown :: dropdown-item('Permissions','lock','UiKitModal.open(\'modal-user-permissions\')','default')}"></li><li th:replace="~{components/dropdown :: dropdown-separator}"></li><li th:replace="~{components/dropdown :: dropdown-item('Deactivate','block','UiKitModal.open(\'modal-deactivate-user\')','warning')}"></li></ul></div></td>
+                    </tr>
+                    <tr>
+                        <td data-value="Dan Smith dsmith"><div class="user-cell"><div th:replace="~{components/avatar :: avatar(null,null,'DS','md')}"></div><div style="display:flex;flex-direction:column;gap:1px;"><span class="uikit-text uikit-text-sm uikit-text-semibold">Dan Smith</span><span class="uikit-text uikit-text-sm" style="color:var(--uikit-text-muted);">dsmith</span></div></div></td>
+                        <td data-value="dsmith@islands.internal"><span class="uikit-text uikit-text-sm">dsmith@islands.internal</span></td>
+                        <td data-value="viewer"><span class="role-chip role-viewer">viewer</span></td>
+                        <td><div class="group-list"><span class="group-tag">Viewers</span></div></td>
+                        <td data-value="Active"><span class="badge badge-active">Active</span></td>
+                        <td data-value="2h ago"><span class="uikit-text uikit-text-sm">2h ago</span></td>
+                        <td><div id="dd-u-5" class="uikit-dropdown"><button class="uikit-dropdown-trigger uikit-btn uikit-btn-default uikit-btn-sm" type="button" onclick="UiKitDropdown.toggle('dd-u-5')"><i class="material-icons" style="font-size:1rem;vertical-align:middle;">more_vert</i></button><ul class="uikit-dropdown-menu uikit-menu" role="menu"><li th:replace="~{components/dropdown :: dropdown-item('Edit','edit','UiKitModal.open(\'modal-edit-user\')','default')}"></li><li th:replace="~{components/dropdown :: dropdown-item('Permissions','lock','UiKitModal.open(\'modal-user-permissions\')','default')}"></li><li th:replace="~{components/dropdown :: dropdown-separator}"></li><li th:replace="~{components/dropdown :: dropdown-item('Deactivate','block','UiKitModal.open(\'modal-deactivate-user\')','warning')}"></li></ul></div></td>
+                    </tr>
+                    <tr>
+                        <td data-value="Eva Lee elee"><div class="user-cell"><div th:replace="~{components/avatar :: avatar(null,null,'EL','md')}"></div><div style="display:flex;flex-direction:column;gap:1px;"><span class="uikit-text uikit-text-sm uikit-text-semibold">Eva Lee</span><span class="uikit-text uikit-text-sm" style="color:var(--uikit-text-muted);">elee</span></div></div></td>
+                        <td data-value="elee@islands.internal"><span class="uikit-text uikit-text-sm">elee@islands.internal</span></td>
+                        <td data-value="user"><span class="role-chip role-user">user</span></td>
+                        <td><div class="group-list"><span class="group-tag">Users</span></div></td>
+                        <td data-value="Inactive"><span class="badge badge-inactive">Inactive</span></td>
+                        <td data-value="1w ago"><span class="uikit-text uikit-text-sm">1w ago</span></td>
+                        <td><div id="dd-u-6" class="uikit-dropdown"><button class="uikit-dropdown-trigger uikit-btn uikit-btn-default uikit-btn-sm" type="button" onclick="UiKitDropdown.toggle('dd-u-6')"><i class="material-icons" style="font-size:1rem;vertical-align:middle;">more_vert</i></button><ul class="uikit-dropdown-menu uikit-menu" role="menu"><li th:replace="~{components/dropdown :: dropdown-item('Edit','edit','UiKitModal.open(\'modal-edit-user\')','default')}"></li><li th:replace="~{components/dropdown :: dropdown-item('Permissions','lock','UiKitModal.open(\'modal-user-permissions\')','default')}"></li><li th:replace="~{components/dropdown :: dropdown-item('Activate','check_circle','UiKitModal.open(\'modal-activate-user\')','default')}"></li><li th:replace="~{components/dropdown :: dropdown-separator}"></li><li th:replace="~{components/dropdown :: dropdown-item('Delete','delete','UiKitModal.open(\'modal-delete-user\')','alert')}"></li></ul></div></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ── Groups quick view ───────────────────────────────────────────── -->
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title"><i class="material-icons">workspaces</i> Groups</h2>
+            <a href="/admin/groups" class="uikit-link" style="font-size:9pt;">Manage groups &rarr;</a>
+        </div>
+        <div id="groups-quick-table" class="uikit-table-wrap">
+            <div class="uikit-table-toolbar">
+                <div th:replace="~{components/table :: table-search('groups-quick-table')}"></div>
+                <span class="uikit-table-row-count"></span>
+            </div>
+            <table class="uikit-table">
+                <thead><tr>
+                    <th th:replace="~{components/table :: table-th('Group',       'group')}"></th>
+                    <th th:replace="~{components/table :: table-th('Description', 'description')}"></th>
+                    <th th:replace="~{components/table :: table-th('Members',     'members')}"></th>
+                    <th th:replace="~{components/table :: table-th('Policies',    'policies')}"></th>
+                </tr></thead>
+                <tbody>
+                    <tr><td data-value="Administrators"><span class="uikit-text uikit-text-sm uikit-text-semibold">Administrators</span></td><td data-value="Full system access"><span class="uikit-text uikit-text-sm">Full system access</span></td><td data-value="1"><span class="uikit-text uikit-text-sm">1</span></td><td data-value="Administrator Policy"><span class="uikit-text uikit-text-sm">Administrator Policy</span></td></tr>
+                    <tr><td data-value="Operators"><span class="uikit-text uikit-text-sm uikit-text-semibold">Operators</span></td><td data-value="VM and resource management"><span class="uikit-text uikit-text-sm">VM and resource management</span></td><td data-value="2"><span class="uikit-text uikit-text-sm">2</span></td><td data-value="Operator Policy"><span class="uikit-text uikit-text-sm">Operator Policy</span></td></tr>
+                    <tr><td data-value="Users"><span class="uikit-text uikit-text-sm uikit-text-semibold">Users</span></td><td data-value="Basic resource access"><span class="uikit-text uikit-text-sm">Basic resource access</span></td><td data-value="3"><span class="uikit-text uikit-text-sm">3</span></td><td data-value="User Policy"><span class="uikit-text uikit-text-sm">User Policy</span></td></tr>
+                    <tr><td data-value="Viewers"><span class="uikit-text uikit-text-sm uikit-text-semibold">Viewers</span></td><td data-value="Read-only access"><span class="uikit-text uikit-text-sm">Read-only access</span></td><td data-value="1"><span class="uikit-text uikit-text-sm">1</span></td><td data-value="Viewer Policy"><span class="uikit-text uikit-text-sm">Viewer Policy</span></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ═══════════════ MODALS ═════════════════════════════════════════ -->
+
+    <div id="modal-add-user" class="uikit-modal-backdrop" aria-hidden="true" onclick="if(event.target===this)UiKitModal.close(this.id)">
+        <div class="uikit-modal uikit-modal-md" role="dialog" aria-modal="true">
+            <div class="uikit-modal-header"><span class="uikit-modal-title">Add User</span><button class="uikit-modal-close" onclick="UiKitModal.close('modal-add-user')"><i class="material-icons">close</i></button></div>
+            <div class="uikit-modal-body uikit-modal-form">
+                <div class="form-grid">
+                    <div><label class="form-label">Full Name</label><div th:replace="~{components/textfield :: textfield('u-name', null, 'e.g. Jane Doe', 'text', null)}"></div></div>
+                    <div><label class="form-label">Username</label><div th:replace="~{components/textfield :: textfield('u-user', null, 'e.g. jdoe', 'text', null)}"></div></div>
+                    <div class="span2"><label class="form-label">Email</label><div th:replace="~{components/textfield :: textfield('u-email', null, 'user@islands.internal', 'email', null)}"></div></div>
+                    <div><label class="form-label">Role</label><select class="uikit-input"><option>user</option><option>viewer</option><option>operator</option><option>admin</option></select></div>
+                    <div><label class="form-label">Group</label><select class="uikit-input"><option>Users</option><option>Viewers</option><option>Operators</option><option>Administrators</option></select></div>
+                </div>
+            </div>
+            <div class="uikit-modal-footer"><button class="uikit-btn uikit-btn-default uikit-btn-sm" onclick="UiKitModal.close('modal-add-user')">Cancel</button><button class="uikit-btn uikit-btn-primary uikit-btn-sm">Create User</button></div>
+        </div>
+    </div>
+
+    <div id="modal-edit-user" class="uikit-modal-backdrop" aria-hidden="true" onclick="if(event.target===this)UiKitModal.close(this.id)">
+        <div class="uikit-modal uikit-modal-md" role="dialog" aria-modal="true">
+            <div class="uikit-modal-header"><span class="uikit-modal-title">Edit User</span><button class="uikit-modal-close" onclick="UiKitModal.close('modal-edit-user')"><i class="material-icons">close</i></button></div>
+            <div class="uikit-modal-body uikit-modal-form">
+                <div class="form-grid">
+                    <div><label class="form-label">Full Name</label><div th:replace="~{components/textfield :: textfield('eu-name', 'John Doe', null, 'text', null)}"></div></div>
+                    <div><label class="form-label">Username</label><div th:replace="~{components/textfield :: textfield('eu-user', 'jdoe', null, 'text', null)}"></div></div>
+                    <div class="span2"><label class="form-label">Email</label><div th:replace="~{components/textfield :: textfield('eu-email', 'jdoe@islands.internal', null, 'email', null)}"></div></div>
+                    <div><label class="form-label">Role</label><select class="uikit-input"><option selected>admin</option><option>operator</option><option>user</option><option>viewer</option></select></div>
+                    <div><label class="form-label">Group</label><select class="uikit-input"><option selected>Administrators</option><option>Operators</option><option>Users</option></select></div>
+                </div>
+            </div>
+            <div class="uikit-modal-footer"><button class="uikit-btn uikit-btn-default uikit-btn-sm" onclick="UiKitModal.close('modal-edit-user')">Cancel</button><button class="uikit-btn uikit-btn-primary uikit-btn-sm">Save</button></div>
+        </div>
+    </div>
+
+    <div id="modal-deactivate-user" class="uikit-modal-backdrop" aria-hidden="true" onclick="if(event.target===this)UiKitModal.close(this.id)">
+        <div class="uikit-modal uikit-modal-sm" role="dialog" aria-modal="true">
+            <div class="uikit-modal-header"><span class="uikit-modal-title">Deactivate User</span><button class="uikit-modal-close" onclick="UiKitModal.close('modal-deactivate-user')"><i class="material-icons">close</i></button></div>
+            <div class="uikit-modal-body"><p class="text-muted">Deactivate this user? They will no longer be able to sign in.</p></div>
+            <div class="uikit-modal-footer"><button class="uikit-btn uikit-btn-default uikit-btn-sm" onclick="UiKitModal.close('modal-deactivate-user')">Cancel</button><button class="uikit-btn uikit-btn-warning uikit-btn-sm">Deactivate</button></div>
+        </div>
+    </div>
+
+    <div id="modal-activate-user" class="uikit-modal-backdrop" aria-hidden="true" onclick="if(event.target===this)UiKitModal.close(this.id)">
+        <div class="uikit-modal uikit-modal-sm" role="dialog" aria-modal="true">
+            <div class="uikit-modal-header"><span class="uikit-modal-title">Activate User</span><button class="uikit-modal-close" onclick="UiKitModal.close('modal-activate-user')"><i class="material-icons">close</i></button></div>
+            <div class="uikit-modal-body"><p class="text-muted">Re-activate this user and restore their access?</p></div>
+            <div class="uikit-modal-footer"><button class="uikit-btn uikit-btn-default uikit-btn-sm" onclick="UiKitModal.close('modal-activate-user')">Cancel</button><button class="uikit-btn uikit-btn-success uikit-btn-sm">Activate</button></div>
+        </div>
+    </div>
+
+    <div id="modal-delete-user" class="uikit-modal-backdrop" aria-hidden="true" onclick="if(event.target===this)UiKitModal.close(this.id)">
+        <div class="uikit-modal uikit-modal-sm" role="dialog" aria-modal="true">
+            <div class="uikit-modal-header"><span class="uikit-modal-title">Delete User</span><button class="uikit-modal-close" onclick="UiKitModal.close('modal-delete-user')"><i class="material-icons">close</i></button></div>
+            <div class="uikit-modal-body"><p class="text-muted">Permanently delete this user? All their data and sessions will be removed.</p><p class="text-danger">&#9888; This action cannot be undone.</p></div>
+            <div class="uikit-modal-footer"><button class="uikit-btn uikit-btn-default uikit-btn-sm" onclick="UiKitModal.close('modal-delete-user')">Cancel</button><button class="uikit-btn uikit-btn-alert uikit-btn-sm">Delete</button></div>
+        </div>
+    </div>
+
+    <div id="modal-user-permissions" class="uikit-modal-backdrop" aria-hidden="true" onclick="if(event.target===this)UiKitModal.close(this.id)">
+        <div class="uikit-modal uikit-modal-md" role="dialog" aria-modal="true">
+            <div class="uikit-modal-header"><span class="uikit-modal-title">User Permissions</span><button class="uikit-modal-close" onclick="UiKitModal.close('modal-user-permissions')"><i class="material-icons">close</i></button></div>
+            <div class="uikit-modal-body"><p class="text-muted" style="margin-bottom:12px;">Effective permissions via group <em>Administrators</em>:</p><div style="display:flex;gap:6px;flex-wrap:wrap;"><span style="background:rgba(18,196,33,0.1);color:#0fa21c;padding:2px 8px;border-radius:4px;font-size:8pt;font-weight:600;">*</span></div></div>
+            <div class="uikit-modal-footer"><button class="uikit-btn uikit-btn-default uikit-btn-sm" onclick="UiKitModal.close('modal-user-permissions')">Close</button></div>
+        </div>
+    </div>
+
+</main>
+
+<script th:src="@{/js/table.js}"></script>
+<script th:src="@{/js/modal.js}"></script>
+
+</body>
+</html>
+

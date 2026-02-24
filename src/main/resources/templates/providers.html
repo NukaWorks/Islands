@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Providers — Islands</title>
+    <script th:src="@{/js/theme.js}"></script>
+    <link rel="stylesheet" th:href="@{/css/uikit.css}" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; background-color: var(--uikit-bg-page); font-family: 'Outfit', sans-serif; display: flex; height: 100vh; color: var(--uikit-text-color); }
+        main { flex: 1; padding: 32px; overflow-y: auto; }
+        .page-header { margin-bottom: 28px; display: flex; align-items: flex-start; justify-content: space-between; }
+        .page-header h1 { font-size: 22pt; margin: 0 0 4px; }
+        .row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-bottom: 8px; }
+
+        /* Provider cards grid */
+        .providers-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; margin-bottom: 28px; }
+        .provider-card { background: var(--uikit-bg-surface); border-radius: 12px; padding: 20px 22px; border: 1px solid var(--uikit-border-color); display: flex; flex-direction: column; gap: 14px; }
+        .provider-card.default-card { border-color: var(--uikit-color-primary); box-shadow: 0 0 0 1px var(--uikit-color-primary); }
+        .provider-header { display: flex; align-items: center; justify-content: space-between; }
+        .provider-info { display: flex; align-items: center; gap: 12px; }
+        .provider-icon { width: 42px; height: 42px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .provider-icon i { font-size: 1.4rem; color: white; }
+        .provider-icon.proxmox  { background: #e4531a; }
+        .provider-icon.aws      { background: #f90; }
+        .provider-icon.azure    { background: #0078d4; }
+        .provider-icon.datalix  { background: #7c3aed; }
+        .provider-icon.gcp      { background: #1a73e8; }
+        .provider-name { font-size: 11pt; font-weight: 600; }
+        .provider-type { font-size: 8pt; color: var(--uikit-text-muted); margin-top: 1px; }
+        .provider-desc { font-size: 9pt; color: var(--uikit-text-muted); line-height: 1.4; }
+        .provider-meta { display: flex; flex-direction: column; gap: 5px; font-size: 8.5pt; color: var(--uikit-text-muted); }
+        .provider-meta-row { display: flex; gap: 8px; }
+        .provider-meta-key { font-weight: 600; color: var(--uikit-text-color); min-width: 80px; }
+        .provider-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 8px; border-top: 1px solid var(--uikit-border-color); }
+        .provider-actions { display: flex; gap: 6px; }
+        .default-tag { font-size: 7.5pt; font-weight: 700; color: var(--uikit-color-primary); background: rgba(30,167,253,0.1); padding: 2px 7px; border-radius: 4px; border: 1px solid rgba(30,167,253,0.3); text-transform: uppercase; letter-spacing: 0.05em; }
+
+        /* Badges */
+        .badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px; font-size: 8pt; font-weight: 600; white-space: nowrap; }
+        .badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+        .badge-online   { background: rgba(18,196,33,0.12);  color: #0fa21c; }
+        .badge-online::before   { background: #12c421; }
+        .badge-offline  { background: rgba(162,162,162,0.15); color: #666; }
+        .badge-offline::before  { background: #a2a2a2; }
+        .badge-error    { background: rgba(255,87,36,0.12);  color: #cc4319; }
+        .badge-error::before    { background: #ff5724; }
+        .badge-warning  { background: rgba(234,180,3,0.15);  color: #b08200; }
+        .badge-warning::before  { background: #eab403; }
+    </style>
+</head>
+<body>
+
+<div th:replace="~{components/sidebar :: sidebar('main-sidebar', ~{::sidebar-items})}">
+    <th:block th:fragment="sidebar-items">
+        <a th:replace="~{components/sidebar :: sidebar-item('dashboard', 'Dashboard', '/dashboard', false)}"></a>
+        <a th:replace="~{components/sidebar :: sidebar-item('dns', 'Instances', '/instances', false)}"></a>
+        <a th:replace="~{components/sidebar :: sidebar-item('task', 'Tasks', '/tasks', false)}"></a>
+        <a th:replace="~{components/sidebar :: sidebar-item('group', 'Users', '/users', false)}"></a>
+        <a th:replace="~{components/sidebar :: sidebar-item('cloud', 'Providers', '/providers', true)}"></a>
+        <a th:replace="~{components/sidebar :: sidebar-item('settings', 'Settings', '/settings', false)}"></a>
+    </th:block>
+</div>
+
+<main>
+    <div class="page-header">
+        <div>
+            <h1>Providers</h1>
+            <span th:replace="~{components/text :: text('Manage infrastructure backend connectors.', 'md', 'normal')}"></span>
+        </div>
+        <div class="row">
+            <button th:replace="~{components/button :: button('Add Provider', 'primary', 'sm', 'button')}"></button>
+        </div>
+    </div>
+
+    <div class="providers-grid">
+
+        <!-- Proxmox — default -->
+        <div class="provider-card default-card">
+            <div class="provider-header">
+                <div class="provider-info">
+                    <div class="provider-icon proxmox"><i class="material-icons">storage</i></div>
+                    <div>
+                        <div class="provider-name">Main Proxmox Cluster</div>
+                        <div class="provider-type">proxmox</div>
+                    </div>
+                </div>
+                <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+                    <span class="badge badge-online">Online</span>
+                    <span class="default-tag">Default</span>
+                </div>
+            </div>
+            <div class="provider-desc">Production Proxmox cluster — handles VM and LXC provisioning for primary workloads.</div>
+            <div class="provider-meta">
+                <div class="provider-meta-row">
+                    <span class="provider-meta-key">Endpoint</span>
+                    <span>https://proxmox.infra.internal:8006</span>
+                </div>
+                <div class="provider-meta-row">
+                    <span class="provider-meta-key">Nodes</span>
+                    <span>3 active</span>
+                </div>
+                <div class="provider-meta-row">
+                    <span class="provider-meta-key">Instances</span>
+                    <span>9 running</span>
+                </div>
+            </div>
+            <div class="provider-footer">
+                <div class="provider-actions">
+                    <button th:replace="~{components/button :: button('Test', 'default', 'sm', 'button')}"></button>
+                    <button th:replace="~{components/button :: button('Edit', 'primary', 'sm', 'button')}"></button>
+                </div>
+                <span th:replace="~{components/text :: text('Checked 2m ago', 'sm', 'normal')}"></span>
+            </div>
+        </div>
+
+        <!-- AWS -->
+        <div class="provider-card">
+            <div class="provider-header">
+                <div class="provider-info">
+                    <div class="provider-icon aws"><i class="material-icons">cloud</i></div>
+                    <div>
+                        <div class="provider-name">AWS US-East</div>
+                        <div class="provider-type">aws</div>
+                    </div>
+                </div>
+                <span class="badge badge-online">Online</span>
+            </div>
+            <div class="provider-desc">Amazon Web Services — EC2 instances in us-east-1 region.</div>
+            <div class="provider-meta">
+                <div class="provider-meta-row">
+                    <span class="provider-meta-key">Region</span>
+                    <span>us-east-1</span>
+                </div>
+                <div class="provider-meta-row">
+                    <span class="provider-meta-key">Instances</span>
+                    <span>2 running</span>
+                </div>
+                <div class="provider-meta-row">
+                    <span class="provider-meta-key">Endpoint</span>
+                    <span>ec2.us-east-1.amazonaws.com</span>
+                </div>
+            </div>
+            <div class="provider-footer">
+                <div class="provider-actions">
+                    <button th:replace="~{components/button :: button('Test', 'default', 'sm', 'button')}"></button>
+                    <button th:replace="~{components/button :: button('Edit', 'primary', 'sm', 'button')}"></button>
+                    <button th:replace="~{components/button :: button('Delete', 'alert', 'sm', 'button')}"></button>
+                </div>
+                <span th:replace="~{components/text :: text('Checked 5m ago', 'sm', 'normal')}"></span>
+            </div>
+        </div>
+
+        <!-- Datalix -->
+        <div class="provider-card">
+            <div class="provider-header">
+                <div class="provider-info">
+                    <div class="provider-icon datalix"><i class="material-icons">hub</i></div>
+                    <div>
+                        <div class="provider-name">Datalix Production</div>
+                        <div class="provider-type">datalix</div>
+                    </div>
+                </div>
+                <span class="badge badge-online">Online</span>
+            </div>
+            <div class="provider-desc">Datalix cloud platform for container workloads and storage buckets.</div>
+            <div class="provider-meta">
+                <div class="provider-meta-row">
+                    <span class="provider-meta-key">Endpoint</span>
+                    <span>api.datalix.example.com</span>
+                </div>
+                <div class="provider-meta-row">
+                    <span class="provider-meta-key">Instances</span>
+                    <span>1 running</span>
+                </div>
+                <div class="provider-meta-row">
+                    <span class="provider-meta-key">Buckets</span>
+                    <span>3</span>
+                </div>
+            </div>
+            <div class="provider-footer">
+                <div class="provider-actions">
+                    <button th:replace="~{components/button :: button('Test', 'default', 'sm', 'button')}"></button>
+                    <button th:replace="~{components/button :: button('Edit', 'primary', 'sm', 'button')}"></button>
+                    <button th:replace="~{components/button :: button('Delete', 'alert', 'sm', 'button')}"></button>
+                </div>
+                <span th:replace="~{components/text :: text('Checked 12m ago', 'sm', 'normal')}"></span>
+            </div>
+        </div>
+
+        <!-- Azure — error -->
+        <div class="provider-card">
+            <div class="provider-header">
+                <div class="provider-info">
+                    <div class="provider-icon azure"><i class="material-icons">cloud_queue</i></div>
+                    <div>
+                        <div class="provider-name">Azure West-EU</div>
+                        <div class="provider-type">azure</div>
+                    </div>
+                </div>
+                <span class="badge badge-error">Unreachable</span>
+            </div>
+            <div class="provider-desc">Microsoft Azure — West Europe region. Currently unreachable, authentication may have expired.</div>
+            <div class="provider-meta">
+                <div class="provider-meta-row">
+                    <span class="provider-meta-key">Region</span>
+                    <span>westeurope</span>
+                </div>
+                <div class="provider-meta-row">
+                    <span class="provider-meta-key">Instances</span>
+                    <span>0 running</span>
+                </div>
+                <div class="provider-meta-row">
+                    <span class="provider-meta-key">Error</span>
+                    <span style="color: var(--uikit-color-alert);">Auth token expired</span>
+                </div>
+            </div>
+            <div class="provider-footer">
+                <div class="provider-actions">
+                    <button th:replace="~{components/button :: button('Reconnect', 'warning', 'sm', 'button')}"></button>
+                    <button th:replace="~{components/button :: button('Edit', 'primary', 'sm', 'button')}"></button>
+                    <button th:replace="~{components/button :: button('Delete', 'alert', 'sm', 'button')}"></button>
+                </div>
+                <span th:replace="~{components/text :: text('Failed 1h ago', 'sm', 'normal')}"></span>
+            </div>
+        </div>
+
+    </div>
+</main>
+
+</body>
+</html>
+

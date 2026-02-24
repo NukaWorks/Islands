@@ -28,9 +28,11 @@
 
 <div th:replace="~{components/sidebar :: sidebar('main-sidebar', ~{::sidebar-items})}">
     <th:block th:fragment="sidebar-items">
-        <a th:replace="~{components/sidebar :: sidebar-item('home', 'Home', '/', false)}"></a>
-        <a th:replace="~{components/sidebar :: sidebar-item('widgets', 'Components', '/components', false)}"></a>
-        <a th:replace="~{components/sidebar :: sidebar-item('palette', 'Theme', '/theme', false)}"></a>
+        <a th:replace="~{components/sidebar :: sidebar-item('dashboard', 'Dashboard', '/dashboard', false)}"></a>
+        <a th:replace="~{components/sidebar :: sidebar-item('dns', 'Instances', '/instances', false)}"></a>
+        <a th:replace="~{components/sidebar :: sidebar-item('task', 'Tasks', '/tasks', false)}"></a>
+        <a th:replace="~{components/sidebar :: sidebar-item('group', 'Users', '/users', false)}"></a>
+        <a th:replace="~{components/sidebar :: sidebar-item('cloud', 'Providers', '/providers', false)}"></a>
         <a th:replace="~{components/sidebar :: sidebar-item('settings', 'Settings', '/settings', true)}"></a>
     </th:block>
 </div>

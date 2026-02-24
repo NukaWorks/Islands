@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Instances — Islands</title>
+    <script th:src="@{/js/theme.js}"></script>
+    <link rel="stylesheet" th:href="@{/css/uikit.css}" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+        * { box-sizing: border-box; }
+        body  { margin: 0; background: var(--uikit-bg-page); font-family: 'Outfit', sans-serif; display: flex; height: 100vh; color: var(--uikit-text-color); }
+        main  { flex: 1; padding: 32px; overflow-y: auto; }
+        .page-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 28px; flex-wrap: wrap; gap: 12px; }
+        .page-header h1 { font-size: 22pt; margin: 0 0 4px; }
+        .card { background: var(--uikit-bg-surface); border-radius: 12px; padding: 24px; border: 1px solid var(--uikit-border-color); margin-bottom: 20px; }
+        .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; flex-wrap: wrap; gap: 12px; }
+        .card-title  { font-size: 12pt; font-weight: 600; margin: 0; display: flex; align-items: center; gap: 8px; }
+        .card-title i { font-size: 1.1rem; color: var(--uikit-color-primary); }
+        .stat-chips { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
+        .stat-chip { background: var(--uikit-bg-surface); border: 1px solid var(--uikit-border-color); border-radius: 8px; padding: 12px 18px; display: flex; flex-direction: column; gap: 2px; min-width: 110px; }
+        .stat-chip-val { font-size: 18pt; font-weight: 700; line-height: 1; }
+        .stat-chip-lbl { font-size: 8pt; color: var(--uikit-text-muted); text-transform: uppercase; letter-spacing: 0.04em; font-weight: 600; }
+        .stat-chip-val.primary { color: var(--uikit-color-primary); }
+        .stat-chip-val.success { color: var(--uikit-color-success); }
+        .stat-chip-val.alert   { color: var(--uikit-color-alert); }
+        .stat-chip-val.muted   { color: var(--uikit-text-muted); }
+        .badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px; font-size: 8pt; font-weight: 600; white-space: nowrap; }
+        .badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+        .badge-running { background: rgba(30,167,253,.12); color: #1ea7fd; } .badge-running::before { background: #1ea7fd; }
+        .badge-stopped { background: rgba(162,162,162,.15); color: #666; }   .badge-stopped::before { background: #a2a2a2; }
+        .badge-error   { background: rgba(255,87,36,.12);  color: #cc4319; } .badge-error::before   { background: #ff5724; }
+        .user-cell { display: flex; align-items: center; gap: 8px; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .form-grid .span2 { grid-column: span 2; }
+        .form-label { font-size: 8.5pt; font-weight: 600; color: var(--uikit-text-muted); margin-bottom: 4px; display: block; text-transform: uppercase; letter-spacing: 0.03em; }
+        .text-muted  { color: var(--uikit-text-muted); font-size: 9pt; }
+        .text-danger { color: var(--uikit-color-alert); font-size: 9pt; margin-top: 8px; }
+        strong { font-weight: 700; }
+    </style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<div th:replace="~{components/sidebar :: sidebar('main-sidebar', ~{::sidebar-content})}">
+    <th:block th:fragment="sidebar-content">
+        <a th:replace="~{components/sidebar :: sidebar-item('dashboard', 'Dashboard', '/dashboard', false)}"></a>
+        <a th:replace="~{components/sidebar :: sidebar-item('dns', 'Instances', '/instances', true)}"></a>
+        <a th:replace="~{components/sidebar :: sidebar-item('task', 'Tasks', '/tasks', false)}"></a>
+        <a th:replace="~{components/sidebar :: sidebar-item('group', 'Users', '/users', false)}"></a>
+        <a th:replace="~{components/sidebar :: sidebar-item('cloud', 'Providers', '/providers', false)}"></a>
+        <a th:replace="~{components/sidebar :: sidebar-item('settings', 'Settings', '/settings', false)}"></a>
+    </th:block>
+</div>
+
+<main>
+
+    <div class="page-header">
+        <div>
+            <h1>Instances</h1>
+            <span th:replace="~{components/text :: text('Manage your virtual machines and containers.', 'md', 'normal')}"></span>
+        </div>
+        <button class="uikit-btn uikit-btn-primary uikit-btn-sm" onclick="UiKitModal.open('modal-new-instance')">New Instance</button>
+    </div>
+
+    <div class="stat-chips">
+        <div class="stat-chip"><div class="stat-chip-val primary">12</div><div class="stat-chip-lbl">Total</div></div>
+        <div class="stat-chip"><div class="stat-chip-val success">8</div><div class="stat-chip-lbl">Running</div></div>
+        <div class="stat-chip"><div class="stat-chip-val muted">3</div><div class="stat-chip-lbl">Stopped</div></div>
+        <div class="stat-chip"><div class="stat-chip-val alert">1</div><div class="stat-chip-lbl">Error</div></div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title"><i class="material-icons">dns</i> All Instances</h2>
+        </div>
+
+        <!-- TABLE WRAP -->
+        <div id="instances-table" class="uikit-table-wrap">
+
+            <!-- Toolbar -->
+            <div class="uikit-table-toolbar">
+                <div th:replace="~{components/table :: table-search('instances-table')}"></div>
+                <select class="uikit-table-filter" data-table="instances-table" data-col="1">
+                    <option value="">All types</option>
+                    <option value="VM">VM</option>
+                    <option value="Container">Container</option>
+                    <option value="LXC">LXC</option>
+                </select>
+                <select class="uikit-table-filter" data-table="instances-table" data-col="2">
+                    <option value="">All providers</option>
+                    <option value="Proxmox">Proxmox</option>
+                    <option value="AWS">AWS</option>
+                    <option value="Datalix">Datalix</option>
+                </select>
+                <select class="uikit-table-filter" data-table="instances-table" data-col="3">
+                    <option value="">All statuses</option>
+                    <option value="Running">Running</option>
+                    <option value="Stopped">Stopped</option>
+                    <option value="Error">Error</option>
+                </select>
+                <span class="uikit-table-row-count"></span>
+            </div>
+
+            <table class="uikit-table">
+                <thead><tr>
+                    <th th:replace="~{components/table :: table-th('Name',     'name')}"></th>
+                    <th th:replace="~{components/table :: table-th('Type',     'type')}"></th>
+                    <th th:replace="~{components/table :: table-th('Provider', 'provider')}"></th>
+                    <th th:replace="~{components/table :: table-th('Status',   'status')}"></th>
+                    <th th:replace="~{components/table :: table-th('Owner',    'owner')}"></th>
+                    <th th:replace="~{components/table :: table-th('CPU',      'cpu')}"></th>
+                    <th th:replace="~{components/table :: table-th('Memory',   'memory')}"></th>
+                    <th th:replace="~{components/table :: table-th-plain('Actions')}"></th>
+                </tr></thead>
+                <tbody>
+                    <tr>
+                        <td data-value="web-prod-01"><div style="display:flex;flex-direction:column;gap:1px;"><span class="uikit-text uikit-text-sm uikit-text-semibold">web-prod-01</span><span class="uikit-text uikit-text-sm" style="color:var(--uikit-text-muted);">ID: 101</span></div></td>
+                        <td data-value="VM"><span class="uikit-text uikit-text-sm">VM</span></td>
+                        <td data-value="Proxmox"><span class="uikit-text uikit-text-sm">Proxmox</span></td>
+                        <td data-value="Running"><span class="badge badge-running">Running</span></td>
+                        <td data-value="jdoe"><div class="user-cell"><div th:replace="~{components/avatar :: avatar(null,null,'JD','sm')}"></div><span class="uikit-text uikit-text-sm">jdoe</span></div></td>
+                        <td data-value="4"><span class="uikit-text uikit-text-sm">4 cores</span></td>
+                        <td data-value="8"><span class="uikit-text uikit-text-sm">8 GB</span></td>
+                        <td>
+                            <div id="dd-101" class="uikit-dropdown">
+                                <button class="uikit-dropdown-trigger uikit-btn uikit-btn-default uikit-btn-sm" type="button" onclick="UiKitDropdown.toggle('dd-101')"><i class="material-icons" style="font-size:1rem;vertical-align:middle;">more_vert</i></button>
+                                <ul class="uikit-dropdown-menu uikit-menu" role="menu">
+                                    <li th:replace="~{components/dropdown :: dropdown-item('Console', 'terminal',    'UiKitModal.open(\'modal-console\')', 'default')}"></li>
+                                    <li th:replace="~{components/dropdown :: dropdown-item('Stop',    'stop_circle', 'UiKitModal.open(\'modal-stop\')',    'warning')}"></li>
+                                    <li th:replace="~{components/dropdown :: dropdown-separator}"></li>
+                                    <li th:replace="~{components/dropdown :: dropdown-item('Delete',  'delete',      'UiKitModal.open(\'modal-delete\')',  'alert')}"></li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td data-value="db-replica-02"><div style="display:flex;flex-direction:column;gap:1px;"><span class="uikit-text uikit-text-sm uikit-text-semibold">db-replica-02</span><span class="uikit-text uikit-text-sm" style="color:var(--uikit-text-muted);">ID: 102</span></div></td>
+                        <td data-value="Container"><span class="uikit-text uikit-text-sm">Container</span></td>
+                        <td data-value="Proxmox"><span class="uikit-text uikit-text-sm">Proxmox</span></td>
+                        <td data-value="Running"><span class="badge badge-running">Running</span></td>
+                        <td data-value="alice"><div class="user-cell"><div th:replace="~{components/avatar :: avatar(null,null,'AB','sm')}"></div><span class="uikit-text uikit-text-sm">alice</span></div></td>
+                        <td data-value="2"><span class="uikit-text uikit-text-sm">2 cores</span></td>
+                        <td data-value="4"><span class="uikit-text uikit-text-sm">4 GB</span></td>
+                        <td>
+                            <div id="dd-102" class="uikit-dropdown">
+                                <button class="uikit-dropdown-trigger uikit-btn uikit-btn-default uikit-btn-sm" type="button" onclick="UiKitDropdown.toggle('dd-102')"><i class="material-icons" style="font-size:1rem;vertical-align:middle;">more_vert</i></button>
+                                <ul class="uikit-dropdown-menu uikit-menu" role="menu">
+                                    <li th:replace="~{components/dropdown :: dropdown-item('Console', 'terminal',    'UiKitModal.open(\'modal-console\')', 'default')}"></li>
+                                    <li th:replace="~{components/dropdown :: dropdown-item('Stop',    'stop_circle', 'UiKitModal.open(\'modal-stop\')',    'warning')}"></li>
+                                    <li th:replace="~{components/dropdown :: dropdown-separator}"></li>
+                                    <li th:replace="~{components/dropdown :: dropdown-item('Delete',  'delete',      'UiKitModal.open(\'modal-delete\')',  'alert')}"></li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td data-value="worker-03"><div style="display:flex;flex-direction:column;gap:1px;"><span class="uikit-text uikit-text-sm uikit-text-semibold">worker-03</span><span class="uikit-text uikit-text-sm" style="color:var(--uikit-text-muted);">ID: 103</span></div></td>
+                        <td data-value="VM"><span class="uikit-text uikit-text-sm">VM</span></td>
+                        <td data-value="AWS"><span class="uikit-text uikit-text-sm">AWS</span></td>
+                        <td data-value="Stopped"><span class="badge badge-stopped">Stopped</span></td>
+                        <td data-value="bob"><div class="user-cell"><div th:replace="~{components/avatar :: avatar(null,null,'BT','sm')}"></div><span class="uikit-text uikit-text-sm">bob</span></div></td>
+                        <td data-value="8"><span class="uikit-text uikit-text-sm">8 cores</span></td>
+                        <td data-value="16"><span class="uikit-text uikit-text-sm">16 GB</span></td>
+                        <td>
+                            <div id="dd-103" class="uikit-dropdown">
+                                <button class="uikit-dropdown-trigger uikit-btn uikit-btn-default uikit-btn-sm" type="button" onclick="UiKitDropdown.toggle('dd-103')"><i class="material-icons" style="font-size:1rem;vertical-align:middle;">more_vert</i></button>
+                                <ul class="uikit-dropdown-menu uikit-menu" role="menu">
+                                    <li th:replace="~{components/dropdown :: dropdown-item('Start',  'play_arrow', 'UiKitModal.open(\'modal-start\')',  'default')}"></li>
+                                    <li th:replace="~{components/dropdown :: dropdown-separator}"></li>
+                                    <li th:replace="~{components/dropdown :: dropdown-item('Delete', 'delete',     'UiKitModal.open(\'modal-delete\')', 'alert')}"></li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td data-value="cache-01"><div style="display:flex;flex-direction:column;gap:1px;"><span class="uikit-text uikit-text-sm uikit-text-semibold">cache-01</span><span class="uikit-text uikit-text-sm" style="color:var(--uikit-text-muted);">ID: 104</span></div></td>
+                        <td data-value="LXC"><span class="uikit-text uikit-text-sm">LXC</span></td>
+                        <td data-value="Proxmox"><span class="uikit-text uikit-text-sm">Proxmox</span></td>
+                        <td data-value="Error"><span class="badge badge-error">Error</span></td>
+                        <td data-value="carol"><div class="user-cell"><div th:replace="~{components/avatar :: avatar(null,null,'CK','sm')}"></div><span class="uikit-text uikit-text-sm">carol</span></div></td>
+                        <td data-value="1"><span class="uikit-text uikit-text-sm">1 core</span></td>
+                        <td data-value="2"><span class="uikit-text uikit-text-sm">2 GB</span></td>
+                        <td>
+                            <div id="dd-104" class="uikit-dropdown">
+                                <button class="uikit-dropdown-trigger uikit-btn uikit-btn-default uikit-btn-sm" type="button" onclick="UiKitDropdown.toggle('dd-104')"><i class="material-icons" style="font-size:1rem;vertical-align:middle;">more_vert</i></button>
+                                <ul class="uikit-dropdown-menu uikit-menu" role="menu">
+                                    <li th:replace="~{components/dropdown :: dropdown-item('Restart', 'refresh',  'UiKitModal.open(\'modal-start\')',   'default')}"></li>
+                                    <li th:replace="~{components/dropdown :: dropdown-item('Console', 'terminal', 'UiKitModal.open(\'modal-console\')', 'default')}"></li>
+                                    <li th:replace="~{components/dropdown :: dropdown-separator}"></li>
+                                    <li th:replace="~{components/dropdown :: dropdown-item('Delete',  'delete',   'UiKitModal.open(\'modal-delete\')',  'alert')}"></li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td data-value="api-gateway"><div style="display:flex;flex-direction:column;gap:1px;"><span class="uikit-text uikit-text-sm uikit-text-semibold">api-gateway</span><span class="uikit-text uikit-text-sm" style="color:var(--uikit-text-muted);">ID: 105</span></div></td>
+                        <td data-value="Container"><span class="uikit-text uikit-text-sm">Container</span></td>
+                        <td data-value="Datalix"><span class="uikit-text uikit-text-sm">Datalix</span></td>
+                        <td data-value="Running"><span class="badge badge-running">Running</span></td>
+                        <td data-value="jdoe"><div class="user-cell"><div th:replace="~{components/avatar :: avatar(null,null,'JD','sm')}"></div><span class="uikit-text uikit-text-sm">jdoe</span></div></td>
+                        <td data-value="2"><span class="uikit-text uikit-text-sm">2 cores</span></td>
+                        <td data-value="4"><span class="uikit-text uikit-text-sm">4 GB</span></td>
+                        <td>
+                            <div id="dd-105" class="uikit-dropdown">
+                                <button class="uikit-dropdown-trigger uikit-btn uikit-btn-default uikit-btn-sm" type="button" onclick="UiKitDropdown.toggle('dd-105')"><i class="material-icons" style="font-size:1rem;vertical-align:middle;">more_vert</i></button>
+                                <ul class="uikit-dropdown-menu uikit-menu" role="menu">
+                                    <li th:replace="~{components/dropdown :: dropdown-item('Console', 'terminal',    'UiKitModal.open(\'modal-console\')', 'default')}"></li>
+                                    <li th:replace="~{components/dropdown :: dropdown-item('Stop',    'stop_circle', 'UiKitModal.open(\'modal-stop\')',    'warning')}"></li>
+                                    <li th:replace="~{components/dropdown :: dropdown-separator}"></li>
+                                    <li th:replace="~{components/dropdown :: dropdown-item('Delete',  'delete',      'UiKitModal.open(\'modal-delete\')',  'alert')}"></li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td data-value="monitor-01"><div style="display:flex;flex-direction:column;gap:1px;"><span class="uikit-text uikit-text-sm uikit-text-semibold">monitor-01</span><span class="uikit-text uikit-text-sm" style="color:var(--uikit-text-muted);">ID: 106</span></div></td>
+                        <td data-value="VM"><span class="uikit-text uikit-text-sm">VM</span></td>
+                        <td data-value="Proxmox"><span class="uikit-text uikit-text-sm">Proxmox</span></td>
+                        <td data-value="Running"><span class="badge badge-running">Running</span></td>
+                        <td data-value="jdoe"><div class="user-cell"><div th:replace="~{components/avatar :: avatar(null,null,'JD','sm')}"></div><span class="uikit-text uikit-text-sm">jdoe</span></div></td>
+                        <td data-value="2"><span class="uikit-text uikit-text-sm">2 cores</span></td>
+                        <td data-value="4"><span class="uikit-text uikit-text-sm">4 GB</span></td>
+                        <td>
+                            <div id="dd-106" class="uikit-dropdown">
+                                <button class="uikit-dropdown-trigger uikit-btn uikit-btn-default uikit-btn-sm" type="button" onclick="UiKitDropdown.toggle('dd-106')"><i class="material-icons" style="font-size:1rem;vertical-align:middle;">more_vert</i></button>
+                                <ul class="uikit-dropdown-menu uikit-menu" role="menu">
+                                    <li th:replace="~{components/dropdown :: dropdown-item('Console', 'terminal',    'UiKitModal.open(\'modal-console\')', 'default')}"></li>
+                                    <li th:replace="~{components/dropdown :: dropdown-item('Stop',    'stop_circle', 'UiKitModal.open(\'modal-stop\')',    'warning')}"></li>
+                                    <li th:replace="~{components/dropdown :: dropdown-separator}"></li>
+                                    <li th:replace="~{components/dropdown :: dropdown-item('Delete',  'delete',      'UiKitModal.open(\'modal-delete\')',  'alert')}"></li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div><!-- /instances-table -->
+    </div><!-- /card -->
+
+
+    <!-- ═══════════════════════ MODALS ════════════════════════════════════ -->
+
+    <!-- New Instance -->
+    <div id="modal-new-instance" class="uikit-modal-backdrop" aria-hidden="true" onclick="if(event.target===this)UiKitModal.close(this.id)">
+        <div class="uikit-modal uikit-modal-md" role="dialog" aria-label="New Instance" aria-modal="true">
+            <div class="uikit-modal-header">
+                <span class="uikit-modal-title">New Instance</span>
+                <button class="uikit-modal-close" onclick="UiKitModal.close('modal-new-instance')"><i class="material-icons">close</i></button>
+            </div>
+            <div class="uikit-modal-body uikit-modal-form">
+                <div class="form-grid">
+                    <div><label class="form-label">Name</label><div th:replace="~{components/textfield :: textfield('inst-name', null, 'e.g. web-prod-03', 'text', null)}"></div></div>
+                    <div><label class="form-label">Type</label><select class="uikit-input"><option>VM</option><option>Container</option><option>LXC</option></select></div>
+                    <div><label class="form-label">Provider</label><select class="uikit-input"><option>Proxmox</option><option>AWS</option><option>Datalix</option></select></div>
+                    <div><label class="form-label">Template</label><select class="uikit-input"><option>Ubuntu 24.04 LTS</option><option>Debian 12</option><option>Alpine 3.19</option></select></div>
+                    <div><label class="form-label">CPU Cores</label><div th:replace="~{components/textfield :: textfield('inst-cpu', '2', null, 'number', null)}"></div></div>
+                    <div><label class="form-label">Memory (GB)</label><div th:replace="~{components/textfield :: textfield('inst-mem', '4', null, 'number', null)}"></div></div>
+                    <div class="span2"><label class="form-label">Disk (GB)</label><div th:replace="~{components/textfield :: textfield('inst-disk', '40', null, 'number', null)}"></div></div>
+                </div>
+            </div>
+            <div class="uikit-modal-footer">
+                <button class="uikit-btn uikit-btn-default uikit-btn-sm" onclick="UiKitModal.close('modal-new-instance')">Cancel</button>
+                <button class="uikit-btn uikit-btn-primary uikit-btn-sm">Create</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete confirm -->
+    <div id="modal-delete" class="uikit-modal-backdrop" aria-hidden="true" onclick="if(event.target===this)UiKitModal.close(this.id)">
+        <div class="uikit-modal uikit-modal-sm" role="dialog" aria-label="Delete Instance" aria-modal="true">
+            <div class="uikit-modal-header"><span class="uikit-modal-title">Delete Instance</span><button class="uikit-modal-close" onclick="UiKitModal.close('modal-delete')"><i class="material-icons">close</i></button></div>
+            <div class="uikit-modal-body"><p class="text-muted">Permanently delete <strong>this instance</strong>? All associated data will be removed.</p><p class="text-danger">&#9888; This action cannot be undone.</p></div>
+            <div class="uikit-modal-footer"><button class="uikit-btn uikit-btn-default uikit-btn-sm" onclick="UiKitModal.close('modal-delete')">Cancel</button><button class="uikit-btn uikit-btn-alert uikit-btn-sm">Delete</button></div>
+        </div>
+    </div>
+
+    <!-- Stop confirm -->
+    <div id="modal-stop" class="uikit-modal-backdrop" aria-hidden="true" onclick="if(event.target===this)UiKitModal.close(this.id)">
+        <div class="uikit-modal uikit-modal-sm" role="dialog" aria-label="Stop Instance" aria-modal="true">
+            <div class="uikit-modal-header"><span class="uikit-modal-title">Stop Instance</span><button class="uikit-modal-close" onclick="UiKitModal.close('modal-stop')"><i class="material-icons">close</i></button></div>
+            <div class="uikit-modal-body"><p class="text-muted">Stop this instance? It will be gracefully shut down and can be restarted later.</p></div>
+            <div class="uikit-modal-footer"><button class="uikit-btn uikit-btn-default uikit-btn-sm" onclick="UiKitModal.close('modal-stop')">Cancel</button><button class="uikit-btn uikit-btn-warning uikit-btn-sm">Stop</button></div>
+        </div>
+    </div>
+
+    <!-- Start confirm -->
+    <div id="modal-start" class="uikit-modal-backdrop" aria-hidden="true" onclick="if(event.target===this)UiKitModal.close(this.id)">
+        <div class="uikit-modal uikit-modal-sm" role="dialog" aria-label="Start Instance" aria-modal="true">
+            <div class="uikit-modal-header"><span class="uikit-modal-title">Start Instance</span><button class="uikit-modal-close" onclick="UiKitModal.close('modal-start')"><i class="material-icons">close</i></button></div>
+            <div class="uikit-modal-body"><p class="text-muted">Start this instance using its last saved configuration?</p></div>
+            <div class="uikit-modal-footer"><button class="uikit-btn uikit-btn-default uikit-btn-sm" onclick="UiKitModal.close('modal-start')">Cancel</button><button class="uikit-btn uikit-btn-success uikit-btn-sm">Start</button></div>
+        </div>
+    </div>
+
+    <!-- Console -->
+    <div id="modal-console" class="uikit-modal-backdrop" aria-hidden="true" onclick="if(event.target===this)UiKitModal.close(this.id)">
+        <div class="uikit-modal uikit-modal-lg" role="dialog" aria-label="Console" aria-modal="true">
+            <div class="uikit-modal-header"><span class="uikit-modal-title">Console</span><button class="uikit-modal-close" onclick="UiKitModal.close('modal-console')"><i class="material-icons">close</i></button></div>
+            <div class="uikit-modal-body">
+                <div style="background:#1a1a1a;border-radius:6px;padding:16px;font-family:monospace;font-size:9pt;color:#f0f0f0;min-height:240px;line-height:1.6;">
+                    <span style="color:#12c421;">root@instance</span><span style="color:#aaa;">:~# </span><span style="animation:blink 1s step-end infinite;">&#9608;</span>
+                    <style>@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}</style>
+                </div>
+            </div>
+            <div class="uikit-modal-footer"><button class="uikit-btn uikit-btn-default uikit-btn-sm" onclick="UiKitModal.close('modal-console')">Close</button></div>
+        </div>
+    </div>
+
+</main>
+
+<script th:src="@{/js/table.js}"></script>
+<script th:src="@{/js/modal.js}"></script>
+
+</body>
+</html>
+

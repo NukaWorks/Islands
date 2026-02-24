@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Tasks — Islands</title>
+    <script th:src="@{/js/theme.js}"></script>
+    <link rel="stylesheet" th:href="@{/css/uikit.css}" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+        * { box-sizing: border-box; }
+        body  { margin: 0; background: var(--uikit-bg-page); font-family: 'Outfit', sans-serif; display: flex; height: 100vh; color: var(--uikit-text-color); }
+        main  { flex: 1; padding: 32px; overflow-y: auto; }
+        .page-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 28px; flex-wrap: wrap; gap: 12px; }
+        .page-header h1 { font-size: 22pt; margin: 0 0 4px; }
+        .card { background: var(--uikit-bg-surface); border-radius: 12px; padding: 24px; border: 1px solid var(--uikit-border-color); margin-bottom: 20px; }
+        .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; flex-wrap: wrap; gap: 12px; }
+        .card-title { font-size: 12pt; font-weight: 600; margin: 0; display: flex; align-items: center; gap: 8px; }
+        .card-title i { font-size: 1.1rem; color: var(--uikit-color-primary); }
+
+        /* Stat chips */
+        .stat-chips { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
+        .stat-chip { background: var(--uikit-bg-surface); border: 1px solid var(--uikit-border-color); border-radius: 8px; padding: 12px 18px; display: flex; flex-direction: column; gap: 2px; min-width: 110px; }
+        .stat-chip-val { font-size: 18pt; font-weight: 700; line-height: 1; }
+        .stat-chip-lbl { font-size: 8pt; color: var(--uikit-text-muted); text-transform: uppercase; letter-spacing: 0.04em; font-weight: 600; }
+        .stat-chip-val.primary { color: var(--uikit-color-primary); }
+        .stat-chip-val.success { color: var(--uikit-color-success); }
+        .stat-chip-val.warning { color: var(--uikit-color-warning); }
+        .stat-chip-val.alert   { color: var(--uikit-color-alert); }
+        .stat-chip-val.muted   { color: var(--uikit-text-muted); }
+
+        /* Tabs */
+        .tabs { display: flex; gap: 0; border-bottom: 2px solid var(--uikit-border-color); margin-bottom: 20px; }
+        .tab { padding: 8px 18px; font-family: 'Outfit', sans-serif; font-size: 9.5pt; font-weight: 500; cursor: pointer; border: none; background: none; color: var(--uikit-text-muted); border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.15s; }
+        .tab:hover { color: var(--uikit-text-color); }
+        .tab.active { color: var(--uikit-color-primary); border-bottom-color: var(--uikit-color-primary); font-weight: 600; }
+
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        /* Badges */
+        .badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px; font-size: 8pt; font-weight: 600; white-space: nowrap; }
+        .badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+        .badge-running    { background: rgba(30,167,253,0.12);  color: #1ea7fd; }    .badge-running::before    { background: #1ea7fd; }
+        .badge-completed  { background: rgba(18,196,33,0.12);   color: #0fa21c; }    .badge-completed::before  { background: #12c421; }
+        .badge-pending    { background: rgba(234,180,3,0.15);   color: #b08200; }    .badge-pending::before    { background: #eab403; }
+        .badge-failed     { background: rgba(255,87,36,0.12);   color: #cc4319; }    .badge-failed::before     { background: #ff5724; }
+        .badge-cancelled  { background: rgba(162,162,162,0.15); color: #666; }       .badge-cancelled::before  { background: #a2a2a2; }
+        .badge-scheduled  { background: rgba(162,100,253,0.12); color: #8c4cff; }    .badge-scheduled::before  { background: #8c4cff; }
+
+        /* Progress */
+        .task-progress { display: flex; align-items: center; gap: 8px; min-width: 120px; }
+        .task-progress-bar { flex: 1; height: 6px; background: rgba(128,128,128,0.15); border-radius: 999px; overflow: hidden; }
+        .task-progress-fill { height: 100%; border-radius: 999px; background: var(--uikit-color-primary); }
+        .task-progress-fill.done { background: var(--uikit-color-success); }
+        .text-muted { color: var(--uikit-text-muted); font-size: 9pt; }
+        strong { font-weight: 700; }
+    </style>
+</head>
+<body>
+
+<div th:replace="~{components/sidebar :: sidebar('main-sidebar', ~{::sidebar-content})}">
+    <th:block th:fragment="sidebar-content">
+        <a th:replace="~{components/sidebar :: sidebar-item('dashboard', 'Dashboard', '/dashboard', false)}"></a>
+        <a th:replace="~{components/sidebar :: sidebar-item('dns', 'Instances', '/instances', false)}"></a>
+        <a th:replace="~{components/sidebar :: sidebar-item('task', 'Tasks', '/tasks', true)}"></a>
+        <a th:replace="~{components/sidebar :: sidebar-item('group', 'Users', '/users', false)}"></a>
+        <a th:replace="~{components/sidebar :: sidebar-item('cloud', 'Providers', '/providers', false)}"></a>
+        <a th:replace="~{components/sidebar :: sidebar-item('settings', 'Settings', '/settings', false)}"></a>
+    </th:block>
+</div>
+
+<main>
+    <div class="page-header">
+        <div>
+            <h1>Tasks</h1>
+            <span th:replace="~{components/text :: text('Monitor async jobs and background operations.', 'md', 'normal')}"></span>
+        </div>
+        <button class="uikit-btn uikit-btn-default uikit-btn-sm">Refresh</button>
+    </div>
+
+    <div class="stat-chips">
+        <div class="stat-chip"><div class="stat-chip-val primary">14</div><div class="stat-chip-lbl">Total</div></div>
+        <div class="stat-chip"><div class="stat-chip-val warning">1</div><div class="stat-chip-lbl">Running</div></div>
+        <div class="stat-chip"><div class="stat-chip-val muted">2</div><div class="stat-chip-lbl">Pending</div></div>
+        <div class="stat-chip"><div class="stat-chip-val success">9</div><div class="stat-chip-lbl">Completed</div></div>
+        <div class="stat-chip"><div class="stat-chip-val alert">2</div><div class="stat-chip-lbl">Failed</div></div>
+    </div>
+
+    <div class="tabs">
+        <button class="tab active" onclick="switchTab('active', this)">Active</button>
+        <button class="tab" onclick="switchTab('history', this)">History</button>
+    </div>
+
+    <!-- ── Active Tasks ────────────────────────────────────────────────── -->
+    <div id="panel-active" class="tab-panel active">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title"><i class="material-icons">pending_actions</i> Active Tasks</h2>
+            </div>
+            <div id="tasks-active-table" class="uikit-table-wrap">
+                <div class="uikit-table-toolbar">
+                    <div th:replace="~{components/table :: table-search('tasks-active-table')}"></div>
+                    <select class="uikit-table-filter" data-table="tasks-active-table" data-col="1">
+                        <option value="">All types</option>
+                        <option value="provision">provision</option>
+                        <option value="backup">backup</option>
+                        <option value="deploy">deploy</option>
+                        <option value="snapshot">snapshot</option>
+                    </select>
+                    <select class="uikit-table-filter" data-table="tasks-active-table" data-col="3">
+                        <option value="">All statuses</option>
+                        <option value="Running">Running</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Scheduled">Scheduled</option>
+                    </select>
+                    <span class="uikit-table-row-count"></span>
+                </div>
+                <table class="uikit-table">
+                    <thead><tr>
+                        <th th:replace="~{components/table :: table-th('Task',    'task')}"></th>
+                        <th th:replace="~{components/table :: table-th('Type',    'type')}"></th>
+                        <th th:replace="~{components/table :: table-th('Target',  'target')}"></th>
+                        <th th:replace="~{components/table :: table-th('Status',  'status')}"></th>
+                        <th th:replace="~{components/table :: table-th-plain('Progress')}"></th>
+                        <th th:replace="~{components/table :: table-th('Started', 'started')}"></th>
+                        <th th:replace="~{components/table :: table-th-plain('Actions')}"></th>
+                    </tr></thead>
+                    <tbody>
+                        <tr>
+                            <td data-value="Backup db-replica-02"><div style="display:flex;flex-direction:column;gap:2px;"><span class="uikit-text uikit-text-sm uikit-text-semibold">Backup db-replica-02</span><span class="uikit-text uikit-text-sm" style="color:var(--uikit-text-muted);">task-7f3a9</span></div></td>
+                            <td data-value="backup"><span class="uikit-text uikit-text-sm">backup</span></td>
+                            <td data-value="db-replica-02"><span class="uikit-text uikit-text-sm">db-replica-02</span></td>
+                            <td data-value="Running"><span class="badge badge-running">Running</span></td>
+                            <td><div class="task-progress"><div class="task-progress-bar"><div class="task-progress-fill" style="width:65%"></div></div><span class="uikit-text uikit-text-sm">65%</span></div></td>
+                            <td data-value="5m ago"><span class="uikit-text uikit-text-sm">5m ago</span></td>
+                            <td><div id="dd-ta-1" class="uikit-dropdown"><button class="uikit-dropdown-trigger uikit-btn uikit-btn-default uikit-btn-sm" type="button" onclick="UiKitDropdown.toggle('dd-ta-1')"><i class="material-icons" style="font-size:1rem;vertical-align:middle;">more_vert</i></button><ul class="uikit-dropdown-menu uikit-menu" role="menu"><li th:replace="~{components/dropdown :: dropdown-item('Cancel','cancel','UiKitModal.open(\'modal-cancel-task\')','alert')}"></li></ul></div></td>
+                        </tr>
+                        <tr>
+                            <td data-value="Deploy api-gateway"><div style="display:flex;flex-direction:column;gap:2px;"><span class="uikit-text uikit-text-sm uikit-text-semibold">Deploy api-gateway</span><span class="uikit-text uikit-text-sm" style="color:var(--uikit-text-muted);">task-2c1d4</span></div></td>
+                            <td data-value="deploy"><span class="uikit-text uikit-text-sm">deploy</span></td>
+                            <td data-value="api-gateway"><span class="uikit-text uikit-text-sm">api-gateway</span></td>
+                            <td data-value="Pending"><span class="badge badge-pending">Pending</span></td>
+                            <td><div class="task-progress"><div class="task-progress-bar"><div class="task-progress-fill" style="width:0%"></div></div><span class="uikit-text uikit-text-sm">0%</span></div></td>
+                            <td data-value="8m ago"><span class="uikit-text uikit-text-sm">8m ago</span></td>
+                            <td><div id="dd-ta-2" class="uikit-dropdown"><button class="uikit-dropdown-trigger uikit-btn uikit-btn-default uikit-btn-sm" type="button" onclick="UiKitDropdown.toggle('dd-ta-2')"><i class="material-icons" style="font-size:1rem;vertical-align:middle;">more_vert</i></button><ul class="uikit-dropdown-menu uikit-menu" role="menu"><li th:replace="~{components/dropdown :: dropdown-item('Cancel','cancel','UiKitModal.open(\'modal-cancel-task\')','alert')}"></li></ul></div></td>
+                        </tr>
+                        <tr>
+                            <td data-value="Scheduled snapshot"><div style="display:flex;flex-direction:column;gap:2px;"><span class="uikit-text uikit-text-sm uikit-text-semibold">Scheduled snapshot</span><span class="uikit-text uikit-text-sm" style="color:var(--uikit-text-muted);">task-9e5b2</span></div></td>
+                            <td data-value="snapshot"><span class="uikit-text uikit-text-sm">snapshot</span></td>
+                            <td data-value="web-prod-01"><span class="uikit-text uikit-text-sm">web-prod-01</span></td>
+                            <td data-value="Scheduled"><span class="badge badge-scheduled">Scheduled</span></td>
+                            <td><div class="task-progress"><div class="task-progress-bar"><div class="task-progress-fill" style="width:0%"></div></div><span class="uikit-text uikit-text-sm">–</span></div></td>
+                            <td data-value="in 2h"><span class="uikit-text uikit-text-sm">in 2h</span></td>
+                            <td><div id="dd-ta-3" class="uikit-dropdown"><button class="uikit-dropdown-trigger uikit-btn uikit-btn-default uikit-btn-sm" type="button" onclick="UiKitDropdown.toggle('dd-ta-3')"><i class="material-icons" style="font-size:1rem;vertical-align:middle;">more_vert</i></button><ul class="uikit-dropdown-menu uikit-menu" role="menu"><li th:replace="~{components/dropdown :: dropdown-item('Cancel','cancel','UiKitModal.open(\'modal-cancel-task\')','alert')}"></li></ul></div></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── History Tasks ───────────────────────────────────────────────── -->
+    <div id="panel-history" class="tab-panel">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title"><i class="material-icons">history</i> Task History</h2>
+            </div>
+            <div id="tasks-history-table" class="uikit-table-wrap">
+                <div class="uikit-table-toolbar">
+                    <div th:replace="~{components/table :: table-search('tasks-history-table')}"></div>
+                    <select class="uikit-table-filter" data-table="tasks-history-table" data-col="1">
+                        <option value="">All types</option>
+                        <option value="provision">provision</option>
+                        <option value="destroy">destroy</option>
+                        <option value="backup">backup</option>
+                        <option value="scale">scale</option>
+                    </select>
+                    <select class="uikit-table-filter" data-table="tasks-history-table" data-col="3">
+                        <option value="">All statuses</option>
+                        <option value="Completed">Completed</option>
+                        <option value="Failed">Failed</option>
+                        <option value="Cancelled">Cancelled</option>
+                    </select>
+                    <span class="uikit-table-row-count"></span>
+                </div>
+                <table class="uikit-table">
+                    <thead><tr>
+                        <th th:replace="~{components/table :: table-th('Task',     'task')}"></th>
+                        <th th:replace="~{components/table :: table-th('Type',     'type')}"></th>
+                        <th th:replace="~{components/table :: table-th('Target',   'target')}"></th>
+                        <th th:replace="~{components/table :: table-th('Status',   'status')}"></th>
+                        <th th:replace="~{components/table :: table-th('Duration', 'duration')}"></th>
+                        <th th:replace="~{components/table :: table-th('Finished', 'finished')}"></th>
+                        <th th:replace="~{components/table :: table-th-plain('Actions')}"></th>
+                    </tr></thead>
+                    <tbody>
+                        <tr>
+                            <td data-value="Provision web-prod-01"><div style="display:flex;flex-direction:column;gap:2px;"><span class="uikit-text uikit-text-sm uikit-text-semibold">Provision web-prod-01</span><span class="uikit-text uikit-text-sm" style="color:var(--uikit-text-muted);">task-1a2b3</span></div></td>
+                            <td data-value="provision"><span class="uikit-text uikit-text-sm">provision</span></td>
+                            <td data-value="web-prod-01"><span class="uikit-text uikit-text-sm">web-prod-01</span></td>
+                            <td data-value="Completed"><span class="badge badge-completed">Completed</span></td>
+                            <td data-value="102"><span class="uikit-text uikit-text-sm">1m 42s</span></td>
+                            <td data-value="2m ago"><span class="uikit-text uikit-text-sm">2m ago</span></td>
+                            <td><div id="dd-th-1" class="uikit-dropdown"><button class="uikit-dropdown-trigger uikit-btn uikit-btn-default uikit-btn-sm" type="button" onclick="UiKitDropdown.toggle('dd-th-1')"><i class="material-icons" style="font-size:1rem;vertical-align:middle;">more_vert</i></button><ul class="uikit-dropdown-menu uikit-menu" role="menu"><li th:replace="~{components/dropdown :: dropdown-item('Details','info','UiKitModal.open(\'modal-task-details\')','default')}"></li></ul></div></td>
+                        </tr>
+                        <tr>
+                            <td data-value="Destroy worker-03"><div style="display:flex;flex-direction:column;gap:2px;"><span class="uikit-text uikit-text-sm uikit-text-semibold">Destroy worker-03</span><span class="uikit-text uikit-text-sm" style="color:var(--uikit-text-muted);">task-4d5e6</span></div></td>
+                            <td data-value="destroy"><span class="uikit-text uikit-text-sm">destroy</span></td>
+                            <td data-value="worker-03"><span class="uikit-text uikit-text-sm">worker-03</span></td>
+                            <td data-value="Completed"><span class="badge badge-completed">Completed</span></td>
+                            <td data-value="55"><span class="uikit-text uikit-text-sm">0m 55s</span></td>
+                            <td data-value="1h ago"><span class="uikit-text uikit-text-sm">1h ago</span></td>
+                            <td><div id="dd-th-2" class="uikit-dropdown"><button class="uikit-dropdown-trigger uikit-btn uikit-btn-default uikit-btn-sm" type="button" onclick="UiKitDropdown.toggle('dd-th-2')"><i class="material-icons" style="font-size:1rem;vertical-align:middle;">more_vert</i></button><ul class="uikit-dropdown-menu uikit-menu" role="menu"><li th:replace="~{components/dropdown :: dropdown-item('Details','info','UiKitModal.open(\'modal-task-details\')','default')}"></li></ul></div></td>
+                        </tr>
+                        <tr>
+                            <td data-value="Scale cache-01"><div style="display:flex;flex-direction:column;gap:2px;"><span class="uikit-text uikit-text-sm uikit-text-semibold">Scale cache-01</span><span class="uikit-text uikit-text-sm" style="color:var(--uikit-text-muted);">task-7g8h9</span></div></td>
+                            <td data-value="scale"><span class="uikit-text uikit-text-sm">scale</span></td>
+                            <td data-value="cache-01"><span class="uikit-text uikit-text-sm">cache-01</span></td>
+                            <td data-value="Failed"><span class="badge badge-failed">Failed</span></td>
+                            <td data-value="12"><span class="uikit-text uikit-text-sm">0m 12s</span></td>
+                            <td data-value="2h ago"><span class="uikit-text uikit-text-sm">2h ago</span></td>
+                            <td><div id="dd-th-3" class="uikit-dropdown"><button class="uikit-dropdown-trigger uikit-btn uikit-btn-default uikit-btn-sm" type="button" onclick="UiKitDropdown.toggle('dd-th-3')"><i class="material-icons" style="font-size:1rem;vertical-align:middle;">more_vert</i></button><ul class="uikit-dropdown-menu uikit-menu" role="menu"><li th:replace="~{components/dropdown :: dropdown-item('Retry','refresh','UiKitModal.open(\'modal-retry-task\')','default')}"></li><li th:replace="~{components/dropdown :: dropdown-item('Details','info','UiKitModal.open(\'modal-task-details\')','default')}"></li></ul></div></td>
+                        </tr>
+                        <tr>
+                            <td data-value="Backup api-gateway"><div style="display:flex;flex-direction:column;gap:2px;"><span class="uikit-text uikit-text-sm uikit-text-semibold">Backup api-gateway</span><span class="uikit-text uikit-text-sm" style="color:var(--uikit-text-muted);">task-0i1j2</span></div></td>
+                            <td data-value="backup"><span class="uikit-text uikit-text-sm">backup</span></td>
+                            <td data-value="api-gateway"><span class="uikit-text uikit-text-sm">api-gateway</span></td>
+                            <td data-value="Cancelled"><span class="badge badge-cancelled">Cancelled</span></td>
+                            <td data-value="8"><span class="uikit-text uikit-text-sm">0m 8s</span></td>
+                            <td data-value="3h ago"><span class="uikit-text uikit-text-sm">3h ago</span></td>
+                            <td><div id="dd-th-4" class="uikit-dropdown"><button class="uikit-dropdown-trigger uikit-btn uikit-btn-default uikit-btn-sm" type="button" onclick="UiKitDropdown.toggle('dd-th-4')"><i class="material-icons" style="font-size:1rem;vertical-align:middle;">more_vert</i></button><ul class="uikit-dropdown-menu uikit-menu" role="menu"><li th:replace="~{components/dropdown :: dropdown-item('Details','info','UiKitModal.open(\'modal-task-details\')','default')}"></li></ul></div></td>
+                        </tr>
+                        <tr>
+                            <td data-value="Provision db-replica-02"><div style="display:flex;flex-direction:column;gap:2px;"><span class="uikit-text uikit-text-sm uikit-text-semibold">Provision db-replica-02</span><span class="uikit-text uikit-text-sm" style="color:var(--uikit-text-muted);">task-3k4l5</span></div></td>
+                            <td data-value="provision"><span class="uikit-text uikit-text-sm">provision</span></td>
+                            <td data-value="db-replica-02"><span class="uikit-text uikit-text-sm">db-replica-02</span></td>
+                            <td data-value="Failed"><span class="badge badge-failed">Failed</span></td>
+                            <td data-value="184"><span class="uikit-text uikit-text-sm">3m 04s</span></td>
+                            <td data-value="Yesterday"><span class="uikit-text uikit-text-sm">Yesterday</span></td>
+                            <td><div id="dd-th-5" class="uikit-dropdown"><button class="uikit-dropdown-trigger uikit-btn uikit-btn-default uikit-btn-sm" type="button" onclick="UiKitDropdown.toggle('dd-th-5')"><i class="material-icons" style="font-size:1rem;vertical-align:middle;">more_vert</i></button><ul class="uikit-dropdown-menu uikit-menu" role="menu"><li th:replace="~{components/dropdown :: dropdown-item('Retry','refresh','UiKitModal.open(\'modal-retry-task\')','default')}"></li><li th:replace="~{components/dropdown :: dropdown-item('Details','info','UiKitModal.open(\'modal-task-details\')','default')}"></li></ul></div></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════ MODALS ═════════════════════════════════════════ -->
+
+    <div id="modal-cancel-task" class="uikit-modal-backdrop" aria-hidden="true" onclick="if(event.target===this)UiKitModal.close(this.id)">
+        <div class="uikit-modal uikit-modal-sm" role="dialog" aria-modal="true">
+            <div class="uikit-modal-header"><span class="uikit-modal-title">Cancel Task</span><button class="uikit-modal-close" onclick="UiKitModal.close('modal-cancel-task')"><i class="material-icons">close</i></button></div>
+            <div class="uikit-modal-body"><p class="text-muted">Cancel this task? It will be stopped immediately.</p></div>
+            <div class="uikit-modal-footer"><button class="uikit-btn uikit-btn-default uikit-btn-sm" onclick="UiKitModal.close('modal-cancel-task')">Keep running</button><button class="uikit-btn uikit-btn-alert uikit-btn-sm">Cancel task</button></div>
+        </div>
+    </div>
+
+    <div id="modal-retry-task" class="uikit-modal-backdrop" aria-hidden="true" onclick="if(event.target===this)UiKitModal.close(this.id)">
+        <div class="uikit-modal uikit-modal-sm" role="dialog" aria-modal="true">
+            <div class="uikit-modal-header"><span class="uikit-modal-title">Retry Task</span><button class="uikit-modal-close" onclick="UiKitModal.close('modal-retry-task')"><i class="material-icons">close</i></button></div>
+            <div class="uikit-modal-body"><p class="text-muted">Re-queue this task with its original parameters?</p></div>
+            <div class="uikit-modal-footer"><button class="uikit-btn uikit-btn-default uikit-btn-sm" onclick="UiKitModal.close('modal-retry-task')">Cancel</button><button class="uikit-btn uikit-btn-primary uikit-btn-sm">Retry</button></div>
+        </div>
+    </div>
+
+    <div id="modal-task-details" class="uikit-modal-backdrop" aria-hidden="true" onclick="if(event.target===this)UiKitModal.close(this.id)">
+        <div class="uikit-modal uikit-modal-md" role="dialog" aria-modal="true">
+            <div class="uikit-modal-header"><span class="uikit-modal-title">Task Details</span><button class="uikit-modal-close" onclick="UiKitModal.close('modal-task-details')"><i class="material-icons">close</i></button></div>
+            <div class="uikit-modal-body">
+                <table class="uikit-table" style="font-size:9pt;">
+                    <tbody>
+                        <tr><td style="color:var(--uikit-text-muted);padding:6px 0;width:110px;">Task ID</td><td>task-1a2b3</td></tr>
+                        <tr><td style="color:var(--uikit-text-muted);padding:6px 0;">Type</td><td>provision</td></tr>
+                        <tr><td style="color:var(--uikit-text-muted);padding:6px 0;">Target</td><td>web-prod-01</td></tr>
+                        <tr><td style="color:var(--uikit-text-muted);padding:6px 0;">Status</td><td><span class="badge badge-completed">Completed</span></td></tr>
+                        <tr><td style="color:var(--uikit-text-muted);padding:6px 0;">Duration</td><td>1m 42s</td></tr>
+                        <tr><td style="color:var(--uikit-text-muted);padding:6px 0;">Finished</td><td>2m ago</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="uikit-modal-footer"><button class="uikit-btn uikit-btn-default uikit-btn-sm" onclick="UiKitModal.close('modal-task-details')">Close</button></div>
+        </div>
+    </div>
+
+</main>
+
+<script th:src="@{/js/table.js}"></script>
+<script th:src="@{/js/modal.js}"></script>
+<script>
+function switchTab(name, el) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('panel-' + name).classList.add('active');
+    if (name === 'history') UiKitTable.init('tasks-history-table');
+    if (name === 'active')  UiKitTable.init('tasks-active-table');
+}
+</script>
+
+</body>
+</html>
+
