@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title th:text="${pageTitle != null ? pageTitle + ' — Islands' : 'Islands'}">Islands</title>
+    <!--
+        theme.js MUST be first — it reads localStorage and applies data-theme
+        before any CSS is parsed, preventing a flash of wrong theme.
+    -->
+    <script th:src="@{/js/theme.js}"></script>
+    <link rel="stylesheet" th:href="@{/css/uikit.css}" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+    <!-- Base layout styles shared by every page -->
+    <style>
+        *, *::before, *::after { box-sizing: border-box; }
+        body { margin: 0; background: var(--uikit-bg-page); font-family: 'Outfit', sans-serif; color: var(--uikit-text-color); }
+
+        /* Common page elements every page uses */
+        .page-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 28px; flex-wrap: wrap; gap: 12px; }
+        .page-header h1 { font-size: 22pt; margin: 0 0 4px; }
+        .row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+        .col { display: flex; flex-direction: column; gap: 10px; }
+        .card { background: var(--uikit-bg-surface); border-radius: 12px; padding: 24px; border: 1px solid var(--uikit-border-color); margin-bottom: 20px; }
+        .card-full { background: var(--uikit-bg-surface); border-radius: 12px; padding: 24px; border: 1px solid var(--uikit-border-color); margin-bottom: 20px; }
+        .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; flex-wrap: wrap; gap: 12px; }
+        .card-title { font-size: 12pt; font-weight: 600; margin: 0; display: flex; align-items: center; gap: 8px; }
+        .card-title i { font-size: 1.1rem; color: var(--uikit-color-primary); }
+        .stat-chips { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
+        .stat-chip { background: var(--uikit-bg-surface); border: 1px solid var(--uikit-border-color); border-radius: 8px; padding: 12px 18px; display: flex; flex-direction: column; gap: 2px; min-width: 110px; }
+        .stat-chip-val { font-size: 18pt; font-weight: 700; line-height: 1; }
+        .stat-chip-lbl { font-size: 8pt; color: var(--uikit-text-muted); text-transform: uppercase; letter-spacing: 0.04em; font-weight: 600; }
+        .stat-chip-val.primary { color: var(--uikit-color-primary); }
+        .stat-chip-val.success { color: var(--uikit-color-success); }
+        .stat-chip-val.warning { color: var(--uikit-color-warning); }
+        .stat-chip-val.alert   { color: var(--uikit-color-alert); }
+        .stat-chip-val.muted   { color: var(--uikit-text-muted); }
+        .badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px; font-size: 8pt; font-weight: 600; white-space: nowrap; }
+        .badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+        .badge-running   { background: rgba(30,167,253,.12);  color: #1ea7fd; } .badge-running::before   { background: #1ea7fd; }
+        .badge-online    { background: rgba(18,196,33,.12);   color: #0fa21c; } .badge-online::before    { background: #12c421; }
+        .badge-stopped   { background: rgba(162,162,162,.15); color: #666;    } .badge-stopped::before   { background: #a2a2a2; }
+        .badge-offline   { background: rgba(162,162,162,.15); color: #666;    } .badge-offline::before   { background: #a2a2a2; }
+        .badge-error     { background: rgba(255,87,36,.12);   color: #cc4319; } .badge-error::before     { background: #ff5724; }
+        .badge-pending   { background: rgba(234,180,3,.15);   color: #b08200; } .badge-pending::before   { background: #eab403; }
+        .badge-completed { background: rgba(18,196,33,.12);   color: #0fa21c; } .badge-completed::before { background: #12c421; }
+        .badge-cancelled { background: rgba(162,162,162,.15); color: #666;    } .badge-cancelled::before { background: #a2a2a2; }
+        .badge-active    { background: rgba(18,196,33,.12);   color: #0fa21c; } .badge-active::before    { background: #12c421; }
+        .badge-inactive  { background: rgba(162,162,162,.15); color: #666;    } .badge-inactive::before  { background: #a2a2a2; }
+        .badge-warning   { background: rgba(234,180,3,.15);   color: #b08200; } .badge-warning::before   { background: #eab403; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .form-grid .span2 { grid-column: span 2; }
+        .form-label { font-size: 8.5pt; font-weight: 600; color: var(--uikit-text-muted); margin-bottom: 4px; display: block; text-transform: uppercase; letter-spacing: 0.03em; }
+        .text-muted  { color: var(--uikit-text-muted); font-size: 9pt; }
+        .text-danger { color: var(--uikit-color-alert); font-size: 9pt; margin-top: 8px; }
+        .user-cell   { display: flex; align-items: center; gap: 10px; }
+        strong { font-weight: 700; }
+    </style>
+
+    <!-- Page-specific extra styles injected via th:replace on <head-extra> slot -->
+    <th:block th:replace="${headExtra}"></th:block>
+</head>
+<body>
+
+<!-- ═══ Layout shell ═══════════════════════════════════════════════════════ -->
+<th:block th:fragment="layout(pageTitle, activeNav, headExtra, content)">
+
+<div class="uikit-layout">
+
+    <!-- Appheader (masthead) -->
+    <div th:replace="~{components/appheader :: appheader('Islands', 'My Organization', 'My Organization,Dev Team,Staging', 'John Doe', 'Administrator')}"></div>
+
+    <div class="uikit-layout-body">
+
+        <!-- Sidebar — activeNav drives which item is highlighted -->
+        <nav class="uikit-sidebar" id="main-sidebar">
+            <div class="uikit-sidebar-item" onclick="this.closest('.uikit-sidebar').classList.toggle('closed')">
+                <i class="material-icons">menu</i>
+            </div>
+            <div class="uikit-sidebar-content">
+                <a th:replace="~{components/sidebar :: sidebar-item('dashboard',            'Dashboard', '/dashboard',    ${activeNav == 'dashboard'})}"></a>
+                <a th:replace="~{components/sidebar :: sidebar-item('dns',                  'Instances', '/instances',    ${activeNav == 'instances'})}"></a>
+                <a th:replace="~{components/sidebar :: sidebar-item('task',                 'Tasks',     '/tasks',        ${activeNav == 'tasks'})}"></a>
+                <a th:replace="~{components/sidebar :: sidebar-item('group',                'Users',     '/users',        ${activeNav == 'users'})}"></a>
+                <a th:replace="~{components/sidebar :: sidebar-item('cloud',                'Providers', '/providers',    ${activeNav == 'providers'})}"></a>
+                <a th:replace="~{components/sidebar :: sidebar-item('settings',             'Settings',  '/settings',     ${activeNav == 'settings'})}"></a>
+                <a th:replace="~{components/sidebar :: sidebar-item('admin_panel_settings', 'Admin',     '/admin/groups', ${activeNav == 'admin'})}"></a>
+            </div>
+        </nav>
+
+        <!-- Page content injected here -->
+        <main class="uikit-layout-main">
+            <th:block th:replace="${content}" />
+        </main>
+
+    </div><!-- /uikit-layout-body -->
+</div><!-- /uikit-layout -->
+
+<!-- Global scripts — loaded once, available to every page -->
+<script th:src="@{/js/table.js}"></script>
+<script th:src="@{/js/modal.js}"></script>
+
+</th:block>
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+
+</body>
+</html>
+

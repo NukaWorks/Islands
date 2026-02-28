@@ -1,78 +1,32 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <title>Groups — Islands</title>
-    <script th:src="@{/js/theme.js}"></script>
-    <link rel="stylesheet" th:href="@{/css/uikit.css}" />
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
-    <style>
-        * { box-sizing: border-box; }
-        body  { margin: 0; background: var(--uikit-bg-page); font-family: 'Outfit', sans-serif; display: flex; height: 100vh; color: var(--uikit-text-color); }
-        main  { flex: 1; padding: 32px; overflow-y: auto; }
-        .page-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 28px; flex-wrap: wrap; gap: 12px; }
-        .page-header h1 { font-size: 22pt; margin: 0 0 4px; }
-        .card { background: var(--uikit-bg-surface); border-radius: 12px; padding: 24px; border: 1px solid var(--uikit-border-color); margin-bottom: 20px; }
-        .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; flex-wrap: wrap; gap: 12px; }
-        .card-title { font-size: 12pt; font-weight: 600; margin: 0; display: flex; align-items: center; gap: 8px; }
-        .card-title i { font-size: 1.1rem; color: var(--uikit-color-primary); }
-
-        /* Tabs */
-        .tabs { display: flex; gap: 0; border-bottom: 2px solid var(--uikit-border-color); margin-bottom: 20px; }
-        .tab { padding: 8px 18px; font-family: 'Outfit', sans-serif; font-size: 9.5pt; font-weight: 500; cursor: pointer; border: none; background: none; color: var(--uikit-text-muted); border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.15s; }
-        .tab:hover { color: var(--uikit-text-color); }
-        .tab.active { color: var(--uikit-color-primary); border-bottom-color: var(--uikit-color-primary); font-weight: 600; }
-        .tab-panel { display: none; }
-        .tab-panel.active { display: block; }
-
-        /* Badges */
-        .badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px; font-size: 8pt; font-weight: 600; white-space: nowrap; }
-        .badge-system { background: rgba(30,167,253,0.1);  color: #1ea7fd; border: 1px solid rgba(30,167,253,0.3); }
-        .badge-custom { background: rgba(162,100,253,0.1); color: #8c4cff; border: 1px solid rgba(162,100,253,0.3); }
-
-        /* Tag list */
-        .tag-list { display: flex; gap: 4px; flex-wrap: wrap; }
-        .tag { background: rgba(128,128,128,0.1); color: var(--uikit-text-muted); padding: 1px 7px; border-radius: 4px; font-size: 8pt; border: 1px solid var(--uikit-border-color); }
-
-        /* Policy cards */
-        .policies-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
-        .policy-card { background: var(--uikit-bg-surface); border-radius: 10px; border: 1px solid var(--uikit-border-color); padding: 16px 18px; display: flex; flex-direction: column; gap: 8px; }
-        .policy-header { display: flex; align-items: center; justify-content: space-between; }
-        .policy-name { font-size: 10pt; font-weight: 600; }
-        .policy-desc { font-size: 9pt; color: var(--uikit-text-muted); }
-        .policy-actions { display: flex; gap: 6px; }
-        .effect-allow { background: rgba(18,196,33,0.1); color: #0fa21c; padding: 1px 7px; border-radius: 4px; font-size: 8pt; font-weight: 600; }
-        .effect-deny  { background: rgba(255,87,36,0.1); color: #cc4319; padding: 1px 7px; border-radius: 4px; font-size: 8pt; font-weight: 600; }
-
-        /* Form grid */
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-        .form-grid .span2 { grid-column: span 2; }
-        .form-label { font-size: 8.5pt; font-weight: 600; color: var(--uikit-text-muted); margin-bottom: 4px; display: block; text-transform: uppercase; letter-spacing: 0.03em; }
-        .text-muted { color: var(--uikit-text-muted); font-size: 9pt; }
-        .text-danger { color: var(--uikit-color-alert); font-size: 9pt; margin-top: 8px; }
-        strong { font-weight: 700; }
-    </style>
-</head>
 <body>
+<th:block th:replace="~{layout/application :: layout('Access Control', 'admin', ~{::head-extra}, ~{::content})}">
 
-<div th:replace="~{components/sidebar :: sidebar('main-sidebar', ~{::sidebar-content})}">
-    <th:block th:fragment="sidebar-content">
-        <a th:replace="~{components/sidebar :: sidebar-item('dashboard', 'Dashboard', '/dashboard', false)}"></a>
-        <a th:replace="~{components/sidebar :: sidebar-item('dns', 'Instances', '/instances', false)}"></a>
-        <a th:replace="~{components/sidebar :: sidebar-item('task', 'Tasks', '/tasks', false)}"></a>
-        <a th:replace="~{components/sidebar :: sidebar-item('group', 'Users', '/users', false)}"></a>
-        <a th:replace="~{components/sidebar :: sidebar-item('settings', 'Settings', '/settings', false)}"></a>
-        <a th:replace="~{components/sidebar :: sidebar-item('admin_panel_settings', 'Admin', '/admin/groups', true)}"></a>
-    </th:block>
-</div>
+<style th:fragment="head-extra">
+    .tabs { display: flex; gap: 0; border-bottom: 2px solid var(--uikit-border-color); margin-bottom: 20px; }
+    .tab { padding: 8px 18px; font-family: 'Outfit', sans-serif; font-size: 9.5pt; font-weight: 500; cursor: pointer; border: none; background: none; color: var(--uikit-text-muted); border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.15s; }
+    .tab:hover { color: var(--uikit-text-color); }
+    .tab.active { color: var(--uikit-color-primary); border-bottom-color: var(--uikit-color-primary); font-weight: 600; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+    .badge-system { background: rgba(30,167,253,0.1);  color: #1ea7fd; border: 1px solid rgba(30,167,253,0.3); }
+    .badge-custom { background: rgba(162,100,253,0.1); color: #8c4cff; border: 1px solid rgba(162,100,253,0.3); }
+    .tag-list { display: flex; gap: 4px; flex-wrap: wrap; }
+    .tag { background: rgba(128,128,128,0.1); color: var(--uikit-text-muted); padding: 1px 7px; border-radius: 4px; font-size: 8pt; border: 1px solid var(--uikit-border-color); }
+    .policies-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+    .policy-card { background: var(--uikit-bg-surface); border-radius: 10px; border: 1px solid var(--uikit-border-color); padding: 16px 18px; display: flex; flex-direction: column; gap: 8px; }
+    .policy-header { display: flex; align-items: center; justify-content: space-between; }
+    .policy-name { font-size: 10pt; font-weight: 600; }
+    .policy-desc { font-size: 9pt; color: var(--uikit-text-muted); }
+    .policy-actions { display: flex; gap: 6px; }
+    .effect-allow { background: rgba(18,196,33,0.1); color: #0fa21c; padding: 1px 7px; border-radius: 4px; font-size: 8pt; font-weight: 600; }
+    .effect-deny  { background: rgba(255,87,36,0.1); color: #cc4319; padding: 1px 7px; border-radius: 4px; font-size: 8pt; font-weight: 600; }
+</style>
 
-<main>
+<th:block th:fragment="content">
     <div class="page-header">
-        <div>
-            <h1>Access Control</h1>
-            <span th:replace="~{components/text :: text('Manage groups, memberships and permission policies.', 'md', 'normal')}"></span>
-        </div>
+        <div><h1>Access Control</h1><span th:replace="~{components/text :: text('Manage groups, memberships and permission policies.', 'md', 'normal')}"></span></div>
     </div>
 
     <div class="tabs">
@@ -80,99 +34,51 @@
         <button class="tab" onclick="switchTab('policies', this)">Policies</button>
     </div>
 
-    <!-- ── Groups tab ──────────────────────────────────────────────────── -->
     <div id="panel-groups" class="tab-panel active">
         <div class="card">
-            <div class="card-header">
-                <h2 class="card-title"><i class="material-icons">workspaces</i> Groups</h2>
-                <button class="uikit-btn uikit-btn-primary uikit-btn-sm" onclick="UiKitModal.open('modal-add-group')">Add Group</button>
-            </div>
+            <div class="card-header"><h2 class="card-title"><i class="material-icons">workspaces</i> Groups</h2><button class="uikit-btn uikit-btn-primary uikit-btn-sm" onclick="UiKitModal.open('modal-add-group')">Add Group</button></div>
             <div id="groups-table" class="uikit-table-wrap">
                 <div class="uikit-table-toolbar">
                     <div th:replace="~{components/table :: table-search('groups-table')}"></div>
-                    <select class="uikit-table-filter" data-table="groups-table" data-col="2">
-                        <option value="">All types</option>
-                        <option value="System">System</option>
-                        <option value="Custom">Custom</option>
-                    </select>
+                    <select class="uikit-table-filter" data-table="groups-table" data-col="2"><option value="">All types</option><option>System</option><option>Custom</option></select>
                     <span class="uikit-table-row-count"></span>
                 </div>
                 <table class="uikit-table">
                     <thead><tr>
-                        <th th:replace="~{components/table :: table-th('Group',       'group')}"></th>
-                        <th th:replace="~{components/table :: table-th('Description', 'description')}"></th>
-                        <th th:replace="~{components/table :: table-th('Type',        'type')}"></th>
-                        <th th:replace="~{components/table :: table-th('Members',     'members')}"></th>
+                        <th th:replace="~{components/table :: table-th('Group','group')}"></th>
+                        <th th:replace="~{components/table :: table-th('Description','description')}"></th>
+                        <th th:replace="~{components/table :: table-th('Type','type')}"></th>
+                        <th th:replace="~{components/table :: table-th('Members','members')}"></th>
                         <th th:replace="~{components/table :: table-th-plain('Policies')}"></th>
                         <th th:replace="~{components/table :: table-th-plain('Actions')}"></th>
                     </tr></thead>
                     <tbody>
-                        <tr>
-                            <td data-value="Administrators"><span class="uikit-text uikit-text-sm uikit-text-semibold">Administrators</span></td>
-                            <td data-value="Full system access"><span class="uikit-text uikit-text-sm">Full system access</span></td>
-                            <td data-value="System"><span class="badge badge-system">System</span></td>
-                            <td data-value="1"><span class="uikit-text uikit-text-sm">1</span></td>
-                            <td><div class="tag-list"><span class="tag">Administrator Policy</span></div></td>
-                            <td><div id="dd-g-1" class="uikit-dropdown"><button class="uikit-dropdown-trigger uikit-btn uikit-btn-default uikit-btn-sm" type="button" onclick="UiKitDropdown.toggle('dd-g-1')"><i class="material-icons" style="font-size:1rem;vertical-align:middle;">more_vert</i></button><ul class="uikit-dropdown-menu uikit-menu" role="menu"><li th:replace="~{components/dropdown :: dropdown-item('View','visibility','UiKitModal.open(\'modal-view-group\')','default')}"></li><li th:replace="~{components/dropdown :: dropdown-item('Edit','edit','UiKitModal.open(\'modal-edit-group\')','default')}"></li></ul></div></td>
-                        </tr>
-                        <tr>
-                            <td data-value="Operators"><span class="uikit-text uikit-text-sm uikit-text-semibold">Operators</span></td>
-                            <td data-value="VM and resource management"><span class="uikit-text uikit-text-sm">VM and resource management</span></td>
-                            <td data-value="System"><span class="badge badge-system">System</span></td>
-                            <td data-value="2"><span class="uikit-text uikit-text-sm">2</span></td>
-                            <td><div class="tag-list"><span class="tag">Operator Policy</span></div></td>
-                            <td><div id="dd-g-2" class="uikit-dropdown"><button class="uikit-dropdown-trigger uikit-btn uikit-btn-default uikit-btn-sm" type="button" onclick="UiKitDropdown.toggle('dd-g-2')"><i class="material-icons" style="font-size:1rem;vertical-align:middle;">more_vert</i></button><ul class="uikit-dropdown-menu uikit-menu" role="menu"><li th:replace="~{components/dropdown :: dropdown-item('View','visibility','UiKitModal.open(\'modal-view-group\')','default')}"></li><li th:replace="~{components/dropdown :: dropdown-item('Edit','edit','UiKitModal.open(\'modal-edit-group\')','default')}"></li></ul></div></td>
-                        </tr>
-                        <tr>
-                            <td data-value="Users"><span class="uikit-text uikit-text-sm uikit-text-semibold">Users</span></td>
-                            <td data-value="Basic resource access"><span class="uikit-text uikit-text-sm">Basic resource access</span></td>
-                            <td data-value="System"><span class="badge badge-system">System</span></td>
-                            <td data-value="3"><span class="uikit-text uikit-text-sm">3</span></td>
-                            <td><div class="tag-list"><span class="tag">User Policy</span></div></td>
-                            <td><div id="dd-g-3" class="uikit-dropdown"><button class="uikit-dropdown-trigger uikit-btn uikit-btn-default uikit-btn-sm" type="button" onclick="UiKitDropdown.toggle('dd-g-3')"><i class="material-icons" style="font-size:1rem;vertical-align:middle;">more_vert</i></button><ul class="uikit-dropdown-menu uikit-menu" role="menu"><li th:replace="~{components/dropdown :: dropdown-item('View','visibility','UiKitModal.open(\'modal-view-group\')','default')}"></li><li th:replace="~{components/dropdown :: dropdown-item('Edit','edit','UiKitModal.open(\'modal-edit-group\')','default')}"></li></ul></div></td>
-                        </tr>
-                        <tr>
-                            <td data-value="Viewers"><span class="uikit-text uikit-text-sm uikit-text-semibold">Viewers</span></td>
-                            <td data-value="Read-only access"><span class="uikit-text uikit-text-sm">Read-only access</span></td>
-                            <td data-value="System"><span class="badge badge-system">System</span></td>
-                            <td data-value="1"><span class="uikit-text uikit-text-sm">1</span></td>
-                            <td><div class="tag-list"><span class="tag">Viewer Policy</span></div></td>
-                            <td><div id="dd-g-4" class="uikit-dropdown"><button class="uikit-dropdown-trigger uikit-btn uikit-btn-default uikit-btn-sm" type="button" onclick="UiKitDropdown.toggle('dd-g-4')"><i class="material-icons" style="font-size:1rem;vertical-align:middle;">more_vert</i></button><ul class="uikit-dropdown-menu uikit-menu" role="menu"><li th:replace="~{components/dropdown :: dropdown-item('View','visibility','UiKitModal.open(\'modal-view-group\')','default')}"></li><li th:replace="~{components/dropdown :: dropdown-item('Edit','edit','UiKitModal.open(\'modal-edit-group\')','default')}"></li></ul></div></td>
-                        </tr>
-                        <tr>
-                            <td data-value="Developers"><span class="uikit-text uikit-text-sm uikit-text-semibold">Developers</span></td>
-                            <td data-value="Engineering team with VM creation rights"><span class="uikit-text uikit-text-sm">Engineering team with VM creation rights</span></td>
-                            <td data-value="Custom"><span class="badge badge-custom">Custom</span></td>
-                            <td data-value="2"><span class="uikit-text uikit-text-sm">2</span></td>
-                            <td><div class="tag-list"><span class="tag">Developer Policy</span><span class="tag">User Policy</span></div></td>
-                            <td><div id="dd-g-5" class="uikit-dropdown"><button class="uikit-dropdown-trigger uikit-btn uikit-btn-default uikit-btn-sm" type="button" onclick="UiKitDropdown.toggle('dd-g-5')"><i class="material-icons" style="font-size:1rem;vertical-align:middle;">more_vert</i></button><ul class="uikit-dropdown-menu uikit-menu" role="menu"><li th:replace="~{components/dropdown :: dropdown-item('View','visibility','UiKitModal.open(\'modal-view-group\')','default')}"></li><li th:replace="~{components/dropdown :: dropdown-item('Edit','edit','UiKitModal.open(\'modal-edit-group\')','default')}"></li><li th:replace="~{components/dropdown :: dropdown-separator}"></li><li th:replace="~{components/dropdown :: dropdown-item('Delete','delete','UiKitModal.open(\'modal-delete-group\')','alert')}"></li></ul></div></td>
-                        </tr>
+                        <tr><td data-value="Administrators"><span class="uikit-text uikit-text-sm uikit-text-semibold">Administrators</span></td><td><span class="uikit-text uikit-text-sm">Full system access</span></td><td data-value="System"><span class="badge badge-system">System</span></td><td data-value="1"><span class="uikit-text uikit-text-sm">1</span></td><td><div class="tag-list"><span class="tag">Administrator Policy</span></div></td><td><div id="dd-g-1" class="uikit-dropdown"><button class="uikit-dropdown-trigger uikit-btn uikit-btn-default uikit-btn-sm" onclick="UiKitDropdown.toggle('dd-g-1')"><i class="material-icons" style="font-size:1rem;vertical-align:middle;">more_vert</i></button><ul class="uikit-dropdown-menu uikit-menu" role="menu"><li th:replace="~{components/dropdown :: dropdown-item('View','visibility','UiKitModal.open(\'modal-view-group\')','default')}"></li><li th:replace="~{components/dropdown :: dropdown-item('Edit','edit','UiKitModal.open(\'modal-edit-group\')','default')}"></li></ul></div></td></tr>
+                        <tr><td data-value="Operators"><span class="uikit-text uikit-text-sm uikit-text-semibold">Operators</span></td><td><span class="uikit-text uikit-text-sm">VM and resource management</span></td><td data-value="System"><span class="badge badge-system">System</span></td><td data-value="2"><span class="uikit-text uikit-text-sm">2</span></td><td><div class="tag-list"><span class="tag">Operator Policy</span></div></td><td><div id="dd-g-2" class="uikit-dropdown"><button class="uikit-dropdown-trigger uikit-btn uikit-btn-default uikit-btn-sm" onclick="UiKitDropdown.toggle('dd-g-2')"><i class="material-icons" style="font-size:1rem;vertical-align:middle;">more_vert</i></button><ul class="uikit-dropdown-menu uikit-menu" role="menu"><li th:replace="~{components/dropdown :: dropdown-item('View','visibility','UiKitModal.open(\'modal-view-group\')','default')}"></li><li th:replace="~{components/dropdown :: dropdown-item('Edit','edit','UiKitModal.open(\'modal-edit-group\')','default')}"></li></ul></div></td></tr>
+                        <tr><td data-value="Users"><span class="uikit-text uikit-text-sm uikit-text-semibold">Users</span></td><td><span class="uikit-text uikit-text-sm">Basic resource access</span></td><td data-value="System"><span class="badge badge-system">System</span></td><td data-value="3"><span class="uikit-text uikit-text-sm">3</span></td><td><div class="tag-list"><span class="tag">User Policy</span></div></td><td><div id="dd-g-3" class="uikit-dropdown"><button class="uikit-dropdown-trigger uikit-btn uikit-btn-default uikit-btn-sm" onclick="UiKitDropdown.toggle('dd-g-3')"><i class="material-icons" style="font-size:1rem;vertical-align:middle;">more_vert</i></button><ul class="uikit-dropdown-menu uikit-menu" role="menu"><li th:replace="~{components/dropdown :: dropdown-item('View','visibility','UiKitModal.open(\'modal-view-group\')','default')}"></li><li th:replace="~{components/dropdown :: dropdown-item('Edit','edit','UiKitModal.open(\'modal-edit-group\')','default')}"></li></ul></div></td></tr>
+                        <tr><td data-value="Viewers"><span class="uikit-text uikit-text-sm uikit-text-semibold">Viewers</span></td><td><span class="uikit-text uikit-text-sm">Read-only access</span></td><td data-value="System"><span class="badge badge-system">System</span></td><td data-value="1"><span class="uikit-text uikit-text-sm">1</span></td><td><div class="tag-list"><span class="tag">Viewer Policy</span></div></td><td><div id="dd-g-4" class="uikit-dropdown"><button class="uikit-dropdown-trigger uikit-btn uikit-btn-default uikit-btn-sm" onclick="UiKitDropdown.toggle('dd-g-4')"><i class="material-icons" style="font-size:1rem;vertical-align:middle;">more_vert</i></button><ul class="uikit-dropdown-menu uikit-menu" role="menu"><li th:replace="~{components/dropdown :: dropdown-item('View','visibility','UiKitModal.open(\'modal-view-group\')','default')}"></li><li th:replace="~{components/dropdown :: dropdown-item('Edit','edit','UiKitModal.open(\'modal-edit-group\')','default')}"></li></ul></div></td></tr>
+                        <tr><td data-value="Developers"><span class="uikit-text uikit-text-sm uikit-text-semibold">Developers</span></td><td><span class="uikit-text uikit-text-sm">Engineering team with VM creation rights</span></td><td data-value="Custom"><span class="badge badge-custom">Custom</span></td><td data-value="2"><span class="uikit-text uikit-text-sm">2</span></td><td><div class="tag-list"><span class="tag">Developer Policy</span><span class="tag">User Policy</span></div></td><td><div id="dd-g-5" class="uikit-dropdown"><button class="uikit-dropdown-trigger uikit-btn uikit-btn-default uikit-btn-sm" onclick="UiKitDropdown.toggle('dd-g-5')"><i class="material-icons" style="font-size:1rem;vertical-align:middle;">more_vert</i></button><ul class="uikit-dropdown-menu uikit-menu" role="menu"><li th:replace="~{components/dropdown :: dropdown-item('View','visibility','UiKitModal.open(\'modal-view-group\')','default')}"></li><li th:replace="~{components/dropdown :: dropdown-item('Edit','edit','UiKitModal.open(\'modal-edit-group\')','default')}"></li><li th:replace="~{components/dropdown :: dropdown-separator}"></li><li th:replace="~{components/dropdown :: dropdown-item('Delete','delete','UiKitModal.open(\'modal-delete-group\')','alert')}"></li></ul></div></td></tr>
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
 
-    <!-- ── Policies tab ────────────────────────────────────────────────── -->
     <div id="panel-policies" class="tab-panel">
         <div class="card">
-            <div class="card-header">
-                <h2 class="card-title"><i class="material-icons">policy</i> Policies</h2>
-                <button class="uikit-btn uikit-btn-primary uikit-btn-sm" onclick="UiKitModal.open('modal-create-policy')">Create Policy</button>
-            </div>
+            <div class="card-header"><h2 class="card-title"><i class="material-icons">policy</i> Policies</h2><button class="uikit-btn uikit-btn-primary uikit-btn-sm" onclick="UiKitModal.open('modal-create-policy')">Create Policy</button></div>
             <div class="policies-grid">
                 <div class="policy-card"><div class="policy-header"><span class="policy-name">Administrator Policy</span><span class="effect-allow">Allow</span></div><div class="policy-desc">Grants full system access including all resources and administration.</div><div class="tag-list"><span class="tag">*</span></div><div class="policy-actions"><button class="uikit-btn uikit-btn-default uikit-btn-sm" onclick="UiKitModal.open('modal-view-policy')">View JSON</button><button class="uikit-btn uikit-btn-primary uikit-btn-sm" onclick="UiKitModal.open('modal-edit-policy')">Edit</button></div></div>
                 <div class="policy-card"><div class="policy-header"><span class="policy-name">Operator Policy</span><span class="effect-allow">Allow</span></div><div class="policy-desc">Allows VM and resource management without admin privileges.</div><div class="tag-list"><span class="tag">vm:*</span><span class="tag">resource:*</span><span class="tag">instances:view</span></div><div class="policy-actions"><button class="uikit-btn uikit-btn-default uikit-btn-sm" onclick="UiKitModal.open('modal-view-policy')">View JSON</button><button class="uikit-btn uikit-btn-primary uikit-btn-sm" onclick="UiKitModal.open('modal-edit-policy')">Edit</button></div></div>
                 <div class="policy-card"><div class="policy-header"><span class="policy-name">User Policy</span><span class="effect-allow">Allow</span></div><div class="policy-desc">Basic access — view instances and submit requests.</div><div class="tag-list"><span class="tag">instances:view</span><span class="tag">task:read</span></div><div class="policy-actions"><button class="uikit-btn uikit-btn-default uikit-btn-sm" onclick="UiKitModal.open('modal-view-policy')">View JSON</button><button class="uikit-btn uikit-btn-primary uikit-btn-sm" onclick="UiKitModal.open('modal-edit-policy')">Edit</button></div></div>
-                <div class="policy-card"><div class="policy-header"><span class="policy-name">Viewer Policy</span><span class="effect-allow">Allow</span></div><div class="policy-desc">Read-only access to instances and tasks.</div><div class="tag-list"><span class="tag">instances:read</span><span class="tag">task:read</span><span class="tag">provider:read</span></div><div class="policy-actions"><button class="uikit-btn uikit-btn-default uikit-btn-sm" onclick="UiKitModal.open('modal-view-policy')">View JSON</button><button class="uikit-btn uikit-btn-primary uikit-btn-sm" onclick="UiKitModal.open('modal-edit-policy')">Edit</button></div></div>
+                <div class="policy-card"><div class="policy-header"><span class="policy-name">Viewer Policy</span><span class="effect-allow">Allow</span></div><div class="policy-desc">Read-only access to instances and tasks.</div><div class="tag-list"><span class="tag">instances:read</span><span class="tag">task:read</span></div><div class="policy-actions"><button class="uikit-btn uikit-btn-default uikit-btn-sm" onclick="UiKitModal.open('modal-view-policy')">View JSON</button><button class="uikit-btn uikit-btn-primary uikit-btn-sm" onclick="UiKitModal.open('modal-edit-policy')">Edit</button></div></div>
                 <div class="policy-card"><div class="policy-header"><span class="policy-name">Developer Policy</span><span class="effect-allow">Allow</span></div><div class="policy-desc">VM creation and management for engineering. Excludes admin.</div><div class="tag-list"><span class="tag">vm:create</span><span class="tag">vm:read</span><span class="tag">vm:stop</span><span class="tag">resource:read</span></div><div class="policy-actions"><button class="uikit-btn uikit-btn-default uikit-btn-sm" onclick="UiKitModal.open('modal-view-policy')">View JSON</button><button class="uikit-btn uikit-btn-primary uikit-btn-sm" onclick="UiKitModal.open('modal-edit-policy')">Edit</button><button class="uikit-btn uikit-btn-alert uikit-btn-sm" onclick="UiKitModal.open('modal-delete-policy')">Delete</button></div></div>
                 <div class="policy-card"><div class="policy-header"><span class="policy-name">Deny External Access</span><span class="effect-deny">Deny</span></div><div class="policy-desc">Explicitly denies external provider management for non-admins.</div><div class="tag-list"><span class="tag">provider:create</span><span class="tag">provider:delete</span><span class="tag">admin:*</span></div><div class="policy-actions"><button class="uikit-btn uikit-btn-default uikit-btn-sm" onclick="UiKitModal.open('modal-view-policy')">View JSON</button><button class="uikit-btn uikit-btn-primary uikit-btn-sm" onclick="UiKitModal.open('modal-edit-policy')">Edit</button><button class="uikit-btn uikit-btn-alert uikit-btn-sm" onclick="UiKitModal.open('modal-delete-policy')">Delete</button></div></div>
             </div>
         </div>
     </div>
 
-    <!-- ═══════════════ MODALS ═════════════════════════════════════════ -->
-
+    <!-- MODALS -->
     <div id="modal-add-group" class="uikit-modal-backdrop" aria-hidden="true" onclick="if(event.target===this)UiKitModal.close(this.id)">
         <div class="uikit-modal uikit-modal-sm" role="dialog" aria-modal="true">
             <div class="uikit-modal-header"><span class="uikit-modal-title">Add Group</span><button class="uikit-modal-close" onclick="UiKitModal.close('modal-add-group')"><i class="material-icons">close</i></button></div>
@@ -184,7 +90,6 @@
             <div class="uikit-modal-footer"><button class="uikit-btn uikit-btn-default uikit-btn-sm" onclick="UiKitModal.close('modal-add-group')">Cancel</button><button class="uikit-btn uikit-btn-primary uikit-btn-sm">Create</button></div>
         </div>
     </div>
-
     <div id="modal-edit-group" class="uikit-modal-backdrop" aria-hidden="true" onclick="if(event.target===this)UiKitModal.close(this.id)">
         <div class="uikit-modal uikit-modal-sm" role="dialog" aria-modal="true">
             <div class="uikit-modal-header"><span class="uikit-modal-title">Edit Group</span><button class="uikit-modal-close" onclick="UiKitModal.close('modal-edit-group')"><i class="material-icons">close</i></button></div>
@@ -195,22 +100,18 @@
             <div class="uikit-modal-footer"><button class="uikit-btn uikit-btn-default uikit-btn-sm" onclick="UiKitModal.close('modal-edit-group')">Cancel</button><button class="uikit-btn uikit-btn-primary uikit-btn-sm">Save</button></div>
         </div>
     </div>
-
     <div id="modal-view-group" class="uikit-modal-backdrop" aria-hidden="true" onclick="if(event.target===this)UiKitModal.close(this.id)">
         <div class="uikit-modal uikit-modal-md" role="dialog" aria-modal="true">
             <div class="uikit-modal-header"><span class="uikit-modal-title">Group Details</span><button class="uikit-modal-close" onclick="UiKitModal.close('modal-view-group')"><i class="material-icons">close</i></button></div>
-            <div class="uikit-modal-body">
-                <table class="uikit-table" style="font-size:9pt;"><tbody>
-                    <tr><td style="color:var(--uikit-text-muted);padding:6px 0;width:100px;">Name</td><td>Administrators</td></tr>
-                    <tr><td style="color:var(--uikit-text-muted);padding:6px 0;">Type</td><td><span class="badge badge-system">System</span></td></tr>
-                    <tr><td style="color:var(--uikit-text-muted);padding:6px 0;">Members</td><td>1</td></tr>
-                    <tr><td style="color:var(--uikit-text-muted);padding:6px 0;">Policies</td><td><div class="tag-list"><span class="tag">Administrator Policy</span></div></td></tr>
-                </tbody></table>
-            </div>
+            <div class="uikit-modal-body"><table class="uikit-table" style="font-size:9pt;"><tbody>
+                <tr><td style="color:var(--uikit-text-muted);padding:6px 0;width:100px;">Name</td><td>Administrators</td></tr>
+                <tr><td style="color:var(--uikit-text-muted);padding:6px 0;">Type</td><td><span class="badge badge-system">System</span></td></tr>
+                <tr><td style="color:var(--uikit-text-muted);padding:6px 0;">Members</td><td>1</td></tr>
+                <tr><td style="color:var(--uikit-text-muted);padding:6px 0;">Policies</td><td><div class="tag-list"><span class="tag">Administrator Policy</span></div></td></tr>
+            </tbody></table></div>
             <div class="uikit-modal-footer"><button class="uikit-btn uikit-btn-default uikit-btn-sm" onclick="UiKitModal.close('modal-view-group')">Close</button></div>
         </div>
     </div>
-
     <div id="modal-delete-group" class="uikit-modal-backdrop" aria-hidden="true" onclick="if(event.target===this)UiKitModal.close(this.id)">
         <div class="uikit-modal uikit-modal-sm" role="dialog" aria-modal="true">
             <div class="uikit-modal-header"><span class="uikit-modal-title">Delete Group</span><button class="uikit-modal-close" onclick="UiKitModal.close('modal-delete-group')"><i class="material-icons">close</i></button></div>
@@ -218,7 +119,6 @@
             <div class="uikit-modal-footer"><button class="uikit-btn uikit-btn-default uikit-btn-sm" onclick="UiKitModal.close('modal-delete-group')">Cancel</button><button class="uikit-btn uikit-btn-alert uikit-btn-sm">Delete</button></div>
         </div>
     </div>
-
     <div id="modal-view-policy" class="uikit-modal-backdrop" aria-hidden="true" onclick="if(event.target===this)UiKitModal.close(this.id)">
         <div class="uikit-modal uikit-modal-md" role="dialog" aria-modal="true">
             <div class="uikit-modal-header"><span class="uikit-modal-title">Policy JSON</span><button class="uikit-modal-close" onclick="UiKitModal.close('modal-view-policy')"><i class="material-icons">close</i></button></div>
@@ -226,7 +126,6 @@
             <div class="uikit-modal-footer"><button class="uikit-btn uikit-btn-default uikit-btn-sm" onclick="UiKitModal.close('modal-view-policy')">Close</button></div>
         </div>
     </div>
-
     <div id="modal-delete-policy" class="uikit-modal-backdrop" aria-hidden="true" onclick="if(event.target===this)UiKitModal.close(this.id)">
         <div class="uikit-modal uikit-modal-sm" role="dialog" aria-modal="true">
             <div class="uikit-modal-header"><span class="uikit-modal-title">Delete Policy</span><button class="uikit-modal-close" onclick="UiKitModal.close('modal-delete-policy')"><i class="material-icons">close</i></button></div>
@@ -235,20 +134,17 @@
         </div>
     </div>
 
-</main>
+    <script>
+    function switchTab(name, el) {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        el.classList.add('active');
+        document.getElementById('panel-' + name).classList.add('active');
+    }
+    </script>
+</th:block>
 
-<script th:src="@{/js/table.js}"></script>
-<script th:src="@{/js/modal.js}"></script>
-<script>
-function switchTab(name, el) {
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-    el.classList.add('active');
-    document.getElementById('panel-' + name).classList.add('active');
-    if (name === 'groups') UiKitTable.init('groups-table');
-}
-</script>
-
+</th:block>
 </body>
 </html>
 

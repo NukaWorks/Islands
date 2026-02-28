@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <style>
         * { box-sizing: border-box; }
-        body  { margin: 0; background: var(--uikit-bg-page); font-family: 'Outfit', sans-serif; display: flex; height: 100vh; color: var(--uikit-text-color); }
+        body  { margin: 0; background: var(--uikit-bg-page); font-family: 'Outfit', sans-serif; color: var(--uikit-text-color); }
         main  { flex: 1; padding: 32px; overflow-y: auto; }
         .page-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 28px; flex-wrap: wrap; gap: 12px; }
         .page-header h1 { font-size: 22pt; margin: 0 0 4px; }
@@ -40,6 +40,12 @@
     </style>
 </head>
 <body>
+<div class="uikit-layout">
+
+<!-- App Header -->
+<div th:replace="~{components/appheader :: appheader('Islands', 'My Organization', 'My Organization,Dev Team,Staging', 'John Doe', 'Administrator')}"></div>
+
+<div class="uikit-layout-body">
 
 <!-- Sidebar -->
 <div th:replace="~{components/sidebar :: sidebar('main-sidebar', ~{::sidebar-content})}">
@@ -51,9 +57,9 @@
         <a th:replace="~{components/sidebar :: sidebar-item('cloud', 'Providers', '/providers', false)}"></a>
         <a th:replace="~{components/sidebar :: sidebar-item('settings', 'Settings', '/settings', false)}"></a>
     </th:block>
-</div>
+</div><!-- /sidebar -->
 
-<main>
+<main class="uikit-layout-main">
 
     <div class="page-header">
         <div>
@@ -310,9 +316,20 @@
 
 </main>
 
+</div><!-- /uikit-layout -->
+
+</div><!-- /uikit-layout-body -->
+</div><!-- /uikit-layout -->
+
 <script th:src="@{/js/table.js}"></script>
 <script th:src="@{/js/modal.js}"></script>
 
 </body>
 </html>
+
+
+
+
+
+
 

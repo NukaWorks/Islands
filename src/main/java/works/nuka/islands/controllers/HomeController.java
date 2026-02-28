@@ -1,17 +1,14 @@
 package works.nuka.islands.controllers;
 
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-
-import java.io.IOException;
 
 @Controller
 public class HomeController {
 
     @GetMapping("/")
-    public void root(HttpServletResponse response) throws IOException {
-        response.sendRedirect("/dashboard");
+    public String root() {
+        return "redirect:/dashboard";
     }
 
     @GetMapping("/dashboard")

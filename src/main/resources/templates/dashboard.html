@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <style>
         * { box-sizing: border-box; }
-        body { margin: 0; background-color: var(--uikit-bg-page); font-family: 'Outfit', sans-serif; display: flex; height: 100vh; color: var(--uikit-text-color); }
+        body { margin: 0; background-color: var(--uikit-bg-page); font-family: 'Outfit', sans-serif; color: var(--uikit-text-color); }
         main { flex: 1; padding: 32px; overflow-y: auto; }
 
         /* Page header */
@@ -91,6 +91,11 @@
     </style>
 </head>
 <body>
+<div class="uikit-layout">
+
+<div th:replace="~{components/appheader :: appheader('Islands', 'My Organization', 'My Organization,Dev Team,Staging', 'John Doe', 'Administrator')}"></div>
+
+<div class="uikit-layout-body">
 
 <div th:replace="~{components/sidebar :: sidebar('main-sidebar', ~{::sidebar-items})}">
     <th:block th:fragment="sidebar-items">
@@ -103,7 +108,7 @@
     </th:block>
 </div>
 
-<main>
+<main class="uikit-layout-main">
     <!-- Page header -->
     <div class="page-header">
         <div class="page-header-row">
@@ -448,7 +453,13 @@
 
 </main>
 
+</div><!-- /uikit-layout-body -->
+</div><!-- /uikit-layout -->
+
 </body>
 </html>
+
+
+
 
 
